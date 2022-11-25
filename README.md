@@ -19,7 +19,7 @@ Password12345
 ```
 
 ## Resources
-I used the following packages in this project.
+I used the following packages and resources in this project.
 
 #### React Vite - [Documentation Link](https://vitejs.dev/guide)
 
