@@ -4,19 +4,19 @@ The leading marketplace for renewed watches. Our mission? To fight e-waste by gi
 Here someone can register as sell and sell used watches free of cost and buyer can purcase using Stripe payment gateway [TEST API].
 
 adminURL
-``
+```
 https://backwatchshop.web.app/dashbaord
-``
+```
 
 adminEmail
-``
+```
 admin@backwatchshop.web.app
-``
+```
 
 adminPassword
-``
+```
 Password12345
-``
+```
 
 #### Live Website - [https://backwatchshop.web.app](https://backwatchshop.web.app)
 
