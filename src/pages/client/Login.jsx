@@ -34,6 +34,35 @@ const Login = () => {
   // Form switching state
   const [type, toggle] = useToggle(['login', 'register']);
 
+  // Set JWT
+  const setJWT = userId => {
+    fetch(`${import.meta.env.VITE_API_Server}/jwt`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({ userId })
+    })
+    .then(res => res.json())
+      .then(data => {
+      if (data.success) {
+        // Store the token
+        localStorage.setItem('token', data.token);
+      } else {
+        // Error toast
+        toast.error(data.error, {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
+      };
+    })
+    .catch(error => {
+      // Error toast
+      toast.error(error.message, {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    });
+  };
+
   // Form initial values and validation
   const form = useForm({
     initialValues: {
@@ -44,7 +73,7 @@ const Login = () => {
       role: true, // Seller role
     },
     validate: {
-      email: (val) => (!/^\S+@\S+$/.test(val)),
+      email: (val) => (!/\S+@\S+\.\S+/.test(val)),
       password: (val) => (val.length <= 6),
       image: (val) => (!val && !form.values.image && type === 'register'),
     },
@@ -65,7 +94,8 @@ const Login = () => {
           // Disable the overlay loading
           setOverlayLoading(false);
         };
-      }).catch((error) => {
+      })
+      .catch((error) => {
         // Error toast
         toast.error(error.message, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -81,11 +111,12 @@ const Login = () => {
       .then(userCredential => {
         // Signed in
         const user = userCredential.user;
-        // Set use details
+        // Update the user profile
         updateUserProfile({ displayName: name, photoURL: image })
           .then(() => {
             // Profile updated!
-          }).catch((error) => {
+          })
+          .catch((error) => {
             // Error toast
             toast.error(error.code, {
               autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -93,10 +124,6 @@ const Login = () => {
           });
         // Storing user to the database function
         storeUser(user?.uid, name, email, image, deleteImage, role);
-        // Successful toast
-        toast.success('Account created successfully!', {
-          autoClose: 1500, position: toast.POSITION.TOP_CENTER
-        });
         // Send verification email [skipped for this assignment, after result just add enable the bellow code]
         // verifyEmail()
         // .then(() => {
@@ -107,9 +134,18 @@ const Login = () => {
         // });
         // Form reset
         form.reset();
-        // Redirect to home
-        navigate('/');
-      }).catch((error) => {
+        // Successful toast
+        toast.success('Account created successfully!', {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
+        // Call JWT function
+        setJWT(user?.uid);
+        // Redirect to targated page or home page
+        setTimeout(() => {
+          navigate(from, { replace: true });
+        }, 1000);
+      })
+      .catch((error) => {
         // Error toast
         toast.error(error.code, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -129,9 +165,14 @@ const Login = () => {
         });
         // Form reset
         form.reset();
-        // Reditect to the targeted page
-        navigate(from, { replace: true });
-      }).catch((error) => {
+        // Call JWT function
+        setJWT(user?.uid);
+        // Redirect to targated page or home page
+        setTimeout(() => {
+          navigate(from, { replace: true });
+        }, 1000);
+      })
+      .catch((error) => {
         // Error toast
         toast.error(error.code, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -149,31 +190,61 @@ const Login = () => {
     .then(result => {
       // Signed in 
       const user = result.user;
-      // Uplading the user photo to server
-      const formData = new FormData();
-      formData.append('image', user?.photoURL);
-      const url = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMBB_API_KEY}`
-      axios.post(url, formData)
+      // Verifying if the user is new or old
+      fetch(`${import.meta.env.VITE_API_Server}/user/${user?.uid}`)
+      .then(res => res.json())
       .then(data => {
-        if (data.data.success) {
-          // Creating user with email and password function
-          storeUser(user?.uid, user?.displayName, user?.email, data.data.data.display_url, data.data.data.delete_url, false);
+        if (data.success) {
+          // Successful toast [old user]
+          toast.success('Logged in successfully!', {
+            autoClose: 1500, position: toast.POSITION.TOP_CENTER
+          });
+          // Call JWT function
+          setJWT(user?.uid);
+          // Redirect to targated page or home page
+          setTimeout(() => {
+            navigate(from, { replace: true });
+          }, 1000);
+        } else {
+          // Uploding the user photo to server [new usre]
+          const formData = new FormData();
+          formData.append('image', user?.photoURL);
+          const url = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMBB_API_KEY}`
+          axios.post(url, formData)
+          .then(data => {
+            if (data.data.success) {
+              // Creating user with email and password function
+              storeUser(user?.uid, user?.displayName, user?.email, data.data.data.display_url, data.data.data.delete_url, false);
+            };
+          })
+          .catch((error) => {
+            // Error toast
+            toast.error(error.message, {
+              autoClose: 1500, position: toast.POSITION.TOP_CENTER
+            });
+          });
+          // Successful toast
+          toast.success('Account created successfully!', {
+            autoClose: 1500, position: toast.POSITION.TOP_CENTER
+          });
+          // Call JWT function
+          setJWT(user?.uid);
+          // Redirect to targated page or home page
+          setTimeout(() => {
+            navigate(from, { replace: true });
+          }, 1000);
         };
-      }).catch((error) => {
+      })
+      .catch(error => {
         // Error toast
         toast.error(error.message, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
       });
-      // Successful toast
-      toast.success('Logged in successfully!', {
-        autoClose: 1500, position: toast.POSITION.TOP_CENTER
-      });
-      // Redirect to home page
-      navigate('/');
-    }).catch((error) => {
+    })
+    .catch((error) => {
       // Error toast
-      toast.error(`${error.code}`, {
+      toast.error(error.code, {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
     });
@@ -181,7 +252,7 @@ const Login = () => {
 
   // Storing user to the database
   const storeUser = (uid, name, email, photoURL, photoDeleteURL, role) => {
-    // Creating object
+    // Creating object to send to the database
     const userInfo = {
       uid,
       name,
@@ -190,7 +261,21 @@ const Login = () => {
       photoDeleteURL,
       role: role ? 'seller' : 'buyer'
     };
-    console.log(userInfo);
+
+    axios.post(`${import.meta.env.VITE_API_Server}/add-user`, userInfo)
+    .then(data => {
+      if (data.success) {
+        toast.success(data.message, {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
+      };
+    })
+    .catch((error) => {
+      // Error toast
+      toast.error(error.message, {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    });
   };
 
   // Handle password reset
@@ -214,14 +299,14 @@ const Login = () => {
     });
   };
 
-  // When user logged in redirect to home
+  // When loading show the loader
   if (loading) {
-    return <Loader variant="bars" className="flex mx-auto"/>
+    return <Loader variant="bars" className="flex mx-auto" />
   };
 
-  // When user logged in redirect to home
+  // When user logged in return to the previous page
   if (user?.uid) {
-    return <Navigate to="/" replace={true} />
+    return <Navigate to='/' state={{ from: location }} replace />
   }
 
   return (
