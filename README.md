@@ -21,7 +21,7 @@ Password12345
 ## Resources
 I used the following packages in this project.
 
-### `React Vite` - [Documentation Link](https://vitejs.dev/guide)
+#### React Vite - [Documentation Link](https://vitejs.dev/guide)
 
 ### `React Router Dom v6.4`
 [Documentation Link](https://reactrouter.com/en/main/start/overview)
