@@ -23,17 +23,12 @@ I used the following packages in this project.
 
 #### React Vite - [Documentation Link](https://vitejs.dev/guide)
 
-### `React Router Dom v6.4`
-[Documentation Link](https://reactrouter.com/en/main/start/overview)
+#### React Router Dom v6.4 - [Documentation Link](https://reactrouter.com/en/main/start/overview)
 
-### `Mantine`
-[Documentation Link](https://mantine.dev/pages/getting-started)
+#### Mantine - [Documentation Link](https://mantine.dev/pages/getting-started)
 
-### `Tailwind CSS`
-[Documentation Link](https://tailwindcss.com/docs)
+#### Tailwind CSS - [Documentation Link](https://tailwindcss.com/docs)
 
-### `tabler icons`
-[Github Link](https://github.com/tabler/tabler-icons)
+#### tabler icons - [Github Link](https://github.com/tabler/tabler-icons)
 
-### `React Toastify`
-[Documentation Link](https://fkhadra.github.io/react-toastify/introduction)
+#### React Toastify - [Documentation Link](https://fkhadra.github.io/react-toastify/introduction)
