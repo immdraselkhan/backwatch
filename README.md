@@ -25,10 +25,14 @@ I used the following packages in this project.
 
 #### React Router Dom v6.4 - [Documentation Link](https://reactrouter.com/en/main/start/overview)
 
+#### TanStack Query v4 - [Documentation Link](https://tanstack.com/query/v4/docs/overview)
+
+#### Axios - [Documentation Link](https://axios-http.com/docs/intro)
+
 #### Mantine - [Documentation Link](https://mantine.dev/pages/getting-started)
 
 #### Tailwind CSS - [Documentation Link](https://tailwindcss.com/docs)
 
-#### tabler icons - [Github Link](https://github.com/tabler/tabler-icons)
+#### Tabler Icons - [Github Link](https://github.com/tabler/tabler-icons)
 
 #### React Toastify - [Documentation Link](https://fkhadra.github.io/react-toastify/introduction)
