@@ -7,10 +7,12 @@ adminURL
 ``
 https://backwatchshop.web.app/dashbaord
 ``
+
 adminEmail
 ``
 admin@backwatchshop.web.app
 ``
+
 adminPassword
 ``
 Password12345
