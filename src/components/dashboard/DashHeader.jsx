@@ -3,8 +3,9 @@ import { AuthContext } from '../../contexts/AuthProvider'
 import { Header, Text, MediaQuery, Burger, ActionIcon, useMantineColorScheme, Menu, Avatar, Box, Indicator } from '@mantine/core'
 import { IconSun, IconMoonStars, IconLogout } from '@tabler/icons'
 import { toast } from 'react-toastify'
+import { Link } from 'react-router-dom'
 
-const DashFooter = ({ opened, setOpened }) => {
+const DashFooter = ({ opened, setOpened, role }) => {
 
   const { user, userLogOut } = useContext(AuthContext);
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
@@ -32,7 +33,7 @@ const DashFooter = ({ opened, setOpened }) => {
         <MediaQuery largerThan="sm" styles={{display: 'none'}}>
           <Burger opened={opened} onClick={() => setOpened(!opened)} size="sm" mr="xl" />
         </MediaQuery>
-        <Text>Admin Dashboard</Text>
+        <Text component={Link} to='/dashboard'>{role === 'admin' ? 'Admin' : (role === 'seller' ? 'Seller' : 'Buyer')} Dashboard</Text>
         <div style={{display: 'flex', alignItems: 'center', gap: '25px', height: '100%'}}>
           <ActionIcon variant="outline" color={dark ? 'yellow' : 'blue'} onClick={() => toggleColorScheme()} title="Toggle color scheme">
             {dark ? <IconSun size={18} /> : <IconMoonStars size={18} />}

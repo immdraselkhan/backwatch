@@ -1,42 +1,56 @@
 import React from 'react'
 import { Navbar, Box, NavLink } from '@mantine/core'
-import { IconDeviceWatchStats, IconBuildingStore, IconBasket, IconMessageReport } from '@tabler/icons'
+import { IconDeviceWatchStats, IconBuildingStore, IconBasket, IconPackage, IconMessageReport } from '@tabler/icons'
 import { Link, useLocation } from 'react-router-dom'
 
-const DashNavbar = ({ opened }) => {
+const DashNavbar = ({ opened, role }) => {
 
+  // useLocation hook
   const location = useLocation()
 
+  // Navbar items data
   const items = [
     {
       link: '',
       label: 'Products',
       icon: IconDeviceWatchStats,
+      permission: role === 'admin' || role === 'seller' ? true: false,
       open: true,
       subItems: [
         {
           link: '/dashboard/product/add',
           label: 'Add product',
+          permission: role === 'seller' ? true : false,
         },
         {
           link: '/dashboard/products',
-          label: 'Products',
+          label: role === 'admin' ? 'All Products' : 'My Products',
+          permission: role === 'admin' || role === 'seller' ? true : false,
         },
       ],
     },
     {
       link: '/dashboard/sellers',
       label: 'All Sellers',
+      permission: role === 'admin' ? true : false,
       icon: IconBuildingStore,
     },
     {
       link: '/dashboard/buyers',
-      label: 'All Buyers',
+      label: role === 'admin' ? 'All Buyers' : 'My Buyers',
+      permission: role === 'admin' || role === 'seller' ? true : false,
       icon: IconBasket,
+    },
+    {
+      link: '/dashboard/orders',
+      label: role === 'admin' ? 'All Orders' : 'My Orders',
+      permission: true,
+      icon: IconPackage,
     },
     {
       link: '/dashboard/reports',
       label: 'Reported Items',
+      permission: role === 'admin' ? true : false,
       icon: IconMessageReport,
     }
   ]
@@ -46,6 +60,7 @@ const DashNavbar = ({ opened }) => {
       <Box>
         {
           items.map(item => (
+            item.permission ?
             <NavLink
               key={item.label}
               component={Link}
@@ -57,16 +72,17 @@ const DashNavbar = ({ opened }) => {
             >
               {
                 item?.subItems?.map(subItem => (
+                  subItem.permission ?
                   <NavLink
                     key={subItem.label}
                     component={Link}
                     to={subItem.link}
                     label={subItem.label}
                     active={location.pathname === subItem.link}
-                  />
+                  /> : false
                 ))
               }
-            </NavLink>
+            </NavLink> : false
           ))
         }
       </Box>

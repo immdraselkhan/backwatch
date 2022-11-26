@@ -1,15 +1,22 @@
 import React from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import Error from '../pages/common/Error'
+import Login from '../pages/client/Login'
 import Main from '../layouts/Main'
 import Dashboard from '../layouts/Dashboard'
 import Home from '../pages/client/Home'
-import Login from '../pages/client/Login'
 import DashHome from '../pages/dashboard/DashHome'
 import AddProducts from '../pages/dashboard/AddProducts'
 import Products from '../pages/dashboard/Products'
 import Blog from '../pages/client/Blog'
 import PrivateRoute from './PrivateRoute'
+import AdminRoute from './AdminRoutes'
+import AdminSellerRoute from './AdminSellerRoute'
+import SellerRoute from './SellerRoute'
+import Orders from '../pages/dashboard/Orders'
+import Reports from '../pages/dashboard/Reports'
+import Sellers from '../pages/dashboard/Sellers'
+import Buyers from '../pages/dashboard/Buyers'
 
 export const router = createBrowserRouter([
   {
@@ -31,27 +38,43 @@ export const router = createBrowserRouter([
       },
       {
         path: '/blog',
-        element: <PrivateRoute><Blog /></PrivateRoute>
+        element: <Blog />
       }
     ],
   },
   {
     path: '/dashboard',
     errorElement: <Error />,
-    element: <Dashboard />,
+    element: <PrivateRoute><Dashboard /></PrivateRoute>,
     children: [
       {
         path: '/dashboard',
-        element: <DashHome />
+        element: <PrivateRoute><DashHome /></PrivateRoute>
       },
       {
         path: '/dashboard/product/add',
-        element: <AddProducts />
+        element: <SellerRoute><AddProducts /></SellerRoute>
       },
       {
         path: '/dashboard/products',
-        element: <Products />
+        element: <AdminSellerRoute><Products /></AdminSellerRoute>
       },
+      {
+        path: '/dashboard/sellers',
+        element: <AdminRoute><Sellers /></AdminRoute>
+      },
+      {
+        path: '/dashboard/buyers',
+        element: <AdminSellerRoute><Buyers /></AdminSellerRoute>
+      },
+      {
+        path: '/dashboard/orders',
+        element: <PrivateRoute><Orders /></PrivateRoute>
+      },
+      {
+        path: '/dashboard/reports',
+        element: <AdminRoute><Reports /></AdminRoute>
+      }
     ],
   }
 ]);
