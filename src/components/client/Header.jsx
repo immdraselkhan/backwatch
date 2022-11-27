@@ -141,7 +141,7 @@ const ClientHeader = () => {
         <Group spacing={5} className={classes.links}>
           {menuItems}
         </Group>
-        <Burger opened={opened} onClick={toggle} className={`${classes.burger} flex-auto ml-3`} size="md" />
+        <Burger opened={opened} onClick={toggle} className={`${classes.burger} flex-auto ml-3`} size="sm" />
         <Transition transition="pop-top-right" duration={200} mounted={opened}>
           {(styles) => (
             <Paper className={classes.dropdown} withBorder style={styles}>
