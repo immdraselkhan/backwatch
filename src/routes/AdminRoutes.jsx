@@ -1,8 +1,8 @@
 import { useContext } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { Loader } from '@mantine/core'
 import { AuthContext } from '../contexts/AuthProvider'
 import useRole from '../hooks/useRole'
+import DataLoader from '../components/common/DataLoader'
 
 const AdminRoute = ({ children }) => {
 
@@ -17,7 +17,7 @@ const AdminRoute = ({ children }) => {
 
   // Loading until we got the user
   if (loading || roleLoading) {
-    return <Loader variant="bars" className="mx-auto min-h-[calc(100vh_-_681px)] sm:min-h-[calc(100vh_-_659px)] md:min-h-[calc(100vh_-_601px)]" />
+    return <DataLoader />;
   };
 
   // When we got the logged in user and matched the role will return the AdminRoute children

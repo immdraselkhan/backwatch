@@ -1,12 +1,13 @@
 import React, { useContext, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../contexts/AuthProvider'
-import { TextInput, PasswordInput, Text, Paper, Group, Button, Divider, Anchor, Stack, Switch, FileInput, Modal, Loader, LoadingOverlay } from '@mantine/core'
+import { TextInput, PasswordInput, Text, Paper, Group, Button, Divider, Anchor, Stack, Switch, FileInput, Modal, LoadingOverlay, Box } from '@mantine/core'
 import { useToggle, upperFirst, useDocumentTitle } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import axios from 'axios'
 import { IconBrandGoogle, IconBrandTwitter, IconUpload } from '@tabler/icons'
 import { toast } from 'react-toastify'
+import DataLoader from '../../components/common/DataLoader'
 
 const Login = () => {
 
@@ -25,7 +26,7 @@ const Login = () => {
   // Previous location
   const from = location.state?.from?.pathname || '/';
 
-  // overlay loader state
+  // Overlay loader state
   const [overlayLoading, setOverlayLoading] = useState(false);
 
   // Modal state
@@ -73,9 +74,9 @@ const Login = () => {
       role: true, // Seller role
     },
     validate: {
-      email: (val) => (!/\S+@\S+\.\S+/.test(val)),
-      password: (val) => (val.length <= 6),
-      image: (val) => (!val && !form.values.image && type === 'register'),
+      email: (value) => (!/\S+@\S+\.\S+/.test(value)),
+      password: (value) => (value.length <= 6),
+      image: (value) => (!value && !form.values.image && type === 'register'),
     },
   });
 
@@ -299,9 +300,9 @@ const Login = () => {
     });
   };
 
-  // When loading show the loader
+  // Loading until we got the data
   if (loading) {
-    return <Loader variant="bars" className="flex mx-auto" />
+    return <DataLoader />;
   };
 
   // When user logged in return to the previous page
@@ -338,85 +339,87 @@ const Login = () => {
 
       <Divider label="Or continue with email" labelPosition="center" my="lg" />
 
-      <form onSubmit={form.onSubmit((values) => {handleSubmit(values); setOverlayLoading((v) => !v)})} style={{ width: 400, position: 'relative' }}>
-        <LoadingOverlay visible={overlayLoading} overlayBlur={2} radius="sm" />
-        <Stack>
-          {type === 'register' && (
+      <Box sx={{ maxWidth: 400 }} mx="auto">
+        <form onSubmit={form.onSubmit((values) => { handleSubmit(values); setOverlayLoading((v) => !v) })} style={{ maxWidth: 400, position: 'relative' }}>
+          <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
+          <Stack>
+            {type === 'register' && (
+              <TextInput
+                required
+                label="Name"
+                placeholder="Your name"
+                value={form.values.name}
+                onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
+              />
+            )}
+
             <TextInput
               required
-              label="Name"
-              placeholder="Your name"
-              value={form.values.name}
-              onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
+              label="Email"
+              placeholder="hi@backwatchshop.web.app"
+              value={form.values.email}
+              onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
+              error={form.errors.email && 'Invalid email'}
             />
-          )}
 
-          <TextInput
-            required
-            label="Email"
-            placeholder="hi@backwatchshop.web.app"
-            value={form.values.email}
-            onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-            error={form.errors.email && 'Invalid email'}
-          />
-
-          <Group style={{ display: 'block'}}>
-            <PasswordInput
-              required
-              label="Password"
-              placeholder="Your password"
-              value={form.values.password}
-              onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
-              error={form.errors.password && 'Password should include at least 6 characters'}
-            />
-            {type === 'login' && (
-              <Anchor
-                component="button"
-                type="button"
-                color="dimmed"
-                onClick={() => setOpened(true)}
-                size="xs"
-              >Forgot password?
-              </Anchor>
-            )}
-          </Group>
-
-          {type === 'register' && (
-            <>
-              <FileInput
+            <Group style={{ display: 'block' }}>
+              <PasswordInput
                 required
-                accept={"image/png,image/jpeg"}
-                label="Your photo"
-                placeholder="Your photo"
-                icon={<IconUpload size={14} />}
-                value={form.values.image}
-                onChange={(event) => form.setFieldValue('image', event)}
-                error={form.errors.image && 'Photo upload is required'}
+                label="Password"
+                placeholder="Your password"
+                value={form.values.password}
+                onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
+                error={form.errors.password && 'Password should include at least 6 characters'}
               />
-              <Switch
-                defaultChecked={form.values.role}
-                label="I want to be a seller!"
-                onChange={(event) => form.setFieldValue('role', event.currentTarget.checked)}
-              />
-            </>
-          )}
-        </Stack>
+              {type === 'login' && (
+                <Anchor
+                  component="button"
+                  type="button"
+                  color="dimmed"
+                  onClick={() => setOpened(true)}
+                  size="xs"
+                >Forgot password?
+                </Anchor>
+              )}
+            </Group>
 
-        <Group position="apart" mt="xl">
-          <Anchor
-            component="button"
-            type="button"
-            color="dimmed"
-            onClick={() => toggle()}
-            size="xs"
-          >
-            {type === 'register'
-              ? 'Already have an account? Login'
-              : "Don't have an account? Register"}
-          </Anchor>
-          <Button type="submit" className="bg-primary hover:bg-secondary">{upperFirst(type)}</Button>
-        </Group>
-      </form>
+            {type === 'register' && (
+              <>
+                <FileInput
+                  required
+                  accept={"image/png,image/jpeg"}
+                  label="Your photo"
+                  placeholder="Your photo"
+                  icon={<IconUpload size={14} />}
+                  value={form.values.image}
+                  onChange={(event) => form.setFieldValue('image', event)}
+                  error={form.errors.image && 'Photo upload is required'}
+                />
+                <Switch
+                  defaultChecked={form.values.role}
+                  label="I want to be a seller!"
+                  onChange={(event) => form.setFieldValue('role', event.currentTarget.checked)}
+                />
+              </>
+            )}
+          </Stack>
+
+          <Group position="apart" mt="xl">
+            <Anchor
+              component="button"
+              type="button"
+              color="dimmed"
+              onClick={() => toggle()}
+              size="xs"
+            >
+              {type === 'register'
+                ? 'Already have an account? Login'
+                : "Don't have an account? Register"}
+            </Anchor>
+            <Button type="submit" className="bg-primary hover:bg-secondary">{upperFirst(type)}</Button>
+          </Group>
+        </form>
+      </Box>
       <Modal
         centered
         opened={opened}

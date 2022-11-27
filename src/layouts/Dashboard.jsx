@@ -1,11 +1,12 @@
 import React, { useContext, useState } from 'react'
-import { AppShell, Loader } from '@mantine/core'
+import { AppShell } from '@mantine/core'
 import DashHeader from '../components/dashboard/DashHeader'
 import DashNavbar from '../components/dashboard/DashNavbar'
 import { Outlet } from 'react-router-dom'
 import DashFooter from '../components/dashboard/DashFooter'
 import { AuthContext } from '../contexts/AuthProvider'
 import useRole from '../hooks/useRole'
+import DataLoader from '../components/common/DataLoader'
 
 const Dashboard = () => {
 
@@ -18,9 +19,9 @@ const Dashboard = () => {
   // Navbar state
   const [opened, setOpened] = useState(false);
 
-  // Loading until we got the user
+  // Loading until we got the data
   if (loading || roleLoading) {
-    return <Loader variant="bars" className="mx-auto min-h-[calc(100vh_-_681px)] sm:min-h-[calc(100vh_-_659px)] md:min-h-[calc(100vh_-_601px)]" />
+    return <DataLoader />;
   };
 
   return (
