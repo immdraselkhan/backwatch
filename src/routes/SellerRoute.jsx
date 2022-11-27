@@ -6,16 +6,16 @@ import DataLoader from '../components/common/DataLoader'
 
 const SellerRoute = ({ children }) => {
 
-  // Getting data from AuthContext
+  // Get data from AuthContext
   const { user, loading } = useContext(AuthContext);
 
-  // Getting user role
+  // Get user role
   const [role, roleLoading] = useRole(user?.uid);
 
-  // Get current location
+  // useLocation hook
   const location = useLocation();
 
-  // Loading until we got the user
+  // Loader until we got the user
   if (loading || roleLoading) {
     return <DataLoader />;
   };

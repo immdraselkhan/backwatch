@@ -1,34 +1,41 @@
 import React, { useContext } from 'react'
+import { Link } from 'react-router-dom'
 import { AuthContext } from '../../contexts/AuthProvider'
 import { Header, Text, MediaQuery, Burger, ActionIcon, useMantineColorScheme, Menu, Avatar, Box, Indicator } from '@mantine/core'
 import { IconSun, IconMoonStars, IconLogout } from '@tabler/icons'
 import { toast } from 'react-toastify'
-import { Link } from 'react-router-dom'
 
-const DashFooter = ({ opened, setOpened, role }) => {
+const DashHeader = ({ opened, setOpened, role }) => {
 
+  // Get data from AuthContext
   const { user, userLogOut } = useContext(AuthContext);
+
+  // Color scheme toggle handler
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
 
   // Sign out
   const logOut = () => {
-    // Logged out
+    // User log out
     userLogOut()
-      .then(() => {
-        // Sign-out successful toast
-        toast.success('User logged out!', {
-          autoClose: 1500, position: toast.POSITION.TOP_CENTER
-        });
-        // Redirect to login
-        navigate('/login');
-      }).catch((error) => {
-        // An error happened
+    .then(() => {
+      // Successful toast
+      toast.success('User logged out!', {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
+      // Redirect to login route
+      navigate('/login');
+    })
+    .catch(error => {
+      // Error toast
+      toast.error(error.code, {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    });
   };
 
   return (
-    <Header height={{base: 50, md: 70}} p="md">
+    <Header height={{base: 50, md: 70}} p="md" className="z-[999]">
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%'}}>
         <MediaQuery largerThan="sm" styles={{display: 'none'}}>
           <Burger opened={opened} onClick={() => setOpened(!opened)} size="sm" mr="xl" />
@@ -61,4 +68,4 @@ const DashFooter = ({ opened, setOpened, role }) => {
   )
 };
 
-export default DashFooter;
+export default DashHeader;

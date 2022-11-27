@@ -19,6 +19,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+// Faqs data
 const faqs = [
   {
     question: 'What are the different ways to manage a state in a React application?',
@@ -36,12 +37,15 @@ const faqs = [
     question: 'React vs. Angular vs. Vue?',
     answer: 'Vue provides higher customizability and hence is easier to learn than Angular or React. Further, Vue has an overlap with Angular and React with respect to their functionality like the use of components. Hence, the transition to Vue from either of the two is an easy option.'
   }
-]
+];
 
 const Blog = () => {
+
   // Set page title
   useDocumentTitle('Blog - BackWatch');
+
   const {classes} = useStyles();
+  
   return (
     <div className={classes.wrapper}>
       <Container size="xl">

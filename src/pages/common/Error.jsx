@@ -1,6 +1,6 @@
 import React from 'react'
-import { createStyles, Image, Container, Title, Text, Button, SimpleGrid } from '@mantine/core'
 import { Link, useRouteError } from 'react-router-dom'
+import { createStyles, Image, Container, Title, Text, Button, SimpleGrid } from '@mantine/core'
 import ErrorImage from '../../assets/error.svg'
 
 const useStyles = createStyles((theme) => ({
@@ -54,7 +54,7 @@ const Error = () => {
       <SimpleGrid spacing={80} cols={2} breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 40 }]}>
         <Image src={ErrorImage} className={classes.mobileImage} />
         <div className="my-auto text-center md:text-left">
-          <Title className={classes.title}>Opps! {error ? <>{error.status} {error.statusText}</> : 'Something is not right...'}</Title>
+          <Title className={classes.title}>Opps! {error?.status ? <>{error?.status} {error?.statusText}</> : 'Something is not right...'}</Title>
           <Text color="dimmed" size="lg">
             Page you are trying to open does not exist. You may have mistyped the address, or the
             page has been moved to another URL. If you think this is an error contact support.

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 
-const useAPI = endpoint => {
+const useParamsAPI = (endpoint, params) => {
   const [data, setData] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   // Fetch method: GET
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_Server}/${endpoint}`)
+    fetch(`${import.meta.env.VITE_API_Server}/${endpoint}/${params}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
@@ -22,9 +22,11 @@ const useAPI = endpoint => {
         // Disable the loader
         setDataLoading(false);
       });
-  }, [endpoint]);
+    // Disable the loader
+    setDataLoading(false);
+  }, [endpoint, params]);
   // Return the data
-  return {data, dataLoading};
+  return { data, dataLoading };
 };
 
-export default useAPI;
+export default useParamsAPI;

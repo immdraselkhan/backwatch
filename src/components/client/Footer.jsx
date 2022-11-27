@@ -1,7 +1,8 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { ActionIcon, Container, createStyles, Group, Text, Affix, Button, Transition } from '@mantine/core'
-import { IconBrandGithub, IconBrandTwitter, IconBrandInstagram, IconArrowUp } from '@tabler/icons'
 import { useWindowScroll } from '@mantine/hooks';
+import { IconBrandGithub, IconBrandTwitter, IconBrandInstagram, IconArrowUp } from '@tabler/icons'
 
 const useStyles = createStyles((theme) => ({
   footer: {
@@ -72,13 +73,15 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const ClientFooter = () => {
+
   const { classes } = useStyles();
+
   const [scroll, scrollTo] = useWindowScroll();
+
   return (
     <footer className={classes.footer}>
       <Container size="xl" className={classes.inner}>
         <div className={classes.logo}>
-          {/* <MantineLogo size={30} /> */}
           <h1>BackWatch</h1>
           <Text size="sm" color="dimmed" className={classes.description}>
             Hello! We're BackWatch, the leading marketplace for renewed watches. Our mission? To fight e-waste by giving expertly restored devices a second life.
@@ -87,7 +90,7 @@ const ClientFooter = () => {
       </Container>
       <Container size="xl" className={classes.afterFooter}>
         <Text color="dimmed" size="sm">
-          © {new Date().getFullYear()} BackWatchShop. All rights reserved.
+          © {new Date().getFullYear()} <Link to="/">BackWatchShop</Link>. All rights reserved.
         </Text>
         <Group spacing={0} className={classes.social} position="right" noWrap>
           <ActionIcon size="lg">

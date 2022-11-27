@@ -1,12 +1,12 @@
 import React from 'react'
-import { Navbar, Box, NavLink } from '@mantine/core'
-import { IconDeviceWatchStats, IconBuildingStore, IconBasket, IconPackage, IconMessageReport } from '@tabler/icons'
 import { Link, useLocation } from 'react-router-dom'
+import { Navbar, Box, NavLink } from '@mantine/core'
+import { IconDeviceWatchStats, IconBuildingStore, IconUsers, IconPackage, IconMessageReport } from '@tabler/icons'
 
 const DashNavbar = ({ opened, role }) => {
 
   // useLocation hook
-  const location = useLocation()
+  const location = useLocation();
 
   // Navbar items data
   const items = [
@@ -14,7 +14,7 @@ const DashNavbar = ({ opened, role }) => {
       link: '',
       label: 'Products',
       icon: IconDeviceWatchStats,
-      permission: role === 'admin' || role === 'seller' ? true: false,
+      permission: role === 'admin' || role === 'seller' ? true : false,
       open: true,
       subItems: [
         {
@@ -39,7 +39,7 @@ const DashNavbar = ({ opened, role }) => {
       link: '/dashboard/buyers',
       label: role === 'admin' ? 'All Buyers' : 'My Buyers',
       permission: role === 'admin' || role === 'seller' ? true : false,
-      icon: IconBasket,
+      icon: IconUsers,
     },
     {
       link: '/dashboard/orders',
@@ -53,7 +53,7 @@ const DashNavbar = ({ opened, role }) => {
       permission: role === 'admin' ? true : false,
       icon: IconMessageReport,
     }
-  ]
+  ];
 
   return (
     <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{sm: 200, lg: 300}}>

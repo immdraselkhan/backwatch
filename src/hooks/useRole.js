@@ -9,13 +9,12 @@ const useRole = uid => {
     if (data.data.success) {
       setRole(data.data.user?.role);
       setRoleLoading(false);
+    } else {
+      setRoleLoading(false);
     };
   })
   .catch((error) => {
-    // Error toast
-    toast.error(error.message, {
-      autoClose: 1500, position: toast.POSITION.TOP_CENTER
-    });
+    setRoleLoading(false);
   });
   return [role, roleLoading];
 };

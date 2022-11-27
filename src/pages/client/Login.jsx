@@ -4,8 +4,8 @@ import { AuthContext } from '../../contexts/AuthProvider'
 import { TextInput, PasswordInput, Text, Paper, Group, Button, Divider, Anchor, Stack, Switch, FileInput, Modal, LoadingOverlay, Box } from '@mantine/core'
 import { useToggle, upperFirst, useDocumentTitle } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
-import axios from 'axios'
 import { IconBrandGoogle, IconBrandTwitter, IconUpload } from '@tabler/icons'
+import axios from 'axios'
 import { toast } from 'react-toastify'
 import DataLoader from '../../components/common/DataLoader'
 
@@ -14,8 +14,8 @@ const Login = () => {
   // Set page title
   useDocumentTitle('Login / Register - BackWatch');
 
-  // Getting data from AuthContext
-  const { user, googleProvider, twitterProvider, logInWithEmailPassword, logInWithPopup, signupWithEmailPassword, updateUserProfile, passwordResetEmail, loading, setLoading } = useContext(AuthContext);
+  // Get data from AuthContext
+  const { user, googleProvider, twitterProvider, logInWithEmailPassword, logInWithPopup, signupWithEmailPassword, updateUserProfile, passwordResetEmail, loading } = useContext(AuthContext);
 
   // useNavigate hook
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ const Login = () => {
       body: JSON.stringify({ userId })
     })
     .then(res => res.json())
-      .then(data => {
+    .then(data => {
       if (data.success) {
         // Store the token
         localStorage.setItem('token', data.token);
@@ -64,15 +64,17 @@ const Login = () => {
     });
   };
 
-  // Form initial values and validation
+  // Mantine useForm
   const form = useForm({
+    // Form initial values
     initialValues: {
       name: '',
       email: '',
       password: '',
       image: '',
-      role: true, // Seller role
+      role: true, // Seller role is default
     },
+    // Form validation
     validate: {
       email: (value) => (!/\S+@\S+\.\S+/.test(value)),
       password: (value) => (value.length <= 6),
@@ -83,6 +85,7 @@ const Login = () => {
   // Handle form submit
   const handleSubmit = values => {
 
+    // User registration form
     if (type === 'register') {
       const formData = new FormData();
       formData.append('image', values.image);
@@ -90,23 +93,28 @@ const Login = () => {
       axios.post(url, formData)
       .then(data => {
         if (data.data.success) {
-          // Creating user with email and password function
+          // Call create user fn with email and password
           createUser(values.name, values.email, values.password, data.data.data.display_url, data.data.data.delete_url, values.role);
-          // Disable the overlay loading
+        } else {
+          // Error toast
+          toast.error(data.data.message, {
+            autoClose: 1500, position: toast.POSITION.TOP_CENTER
+          });
+          // Disable the overlay loader
           setOverlayLoading(false);
         };
       })
-      .catch((error) => {
+      .catch(error => {
         // Error toast
         toast.error(error.message, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
-        // Disable the overlay loading
+        // Disable the overlay loader
         setOverlayLoading(false);
       });
     };
 
-    // Creating user with email and password
+    // Create user with email and password
     const createUser = (name, email, password, image, deleteImage, role) => {
       signupWithEmailPassword(email, password)
       .then(userCredential => {
@@ -117,13 +125,13 @@ const Login = () => {
           .then(() => {
             // Profile updated!
           })
-          .catch((error) => {
+          .catch(error => {
             // Error toast
             toast.error(error.code, {
               autoClose: 1500, position: toast.POSITION.TOP_CENTER
             });
           });
-        // Storing user to the database function
+        // Call store user fn to database
         storeUser(user?.uid, name, email, image, deleteImage, role);
         // Send verification email [skipped for this assignment, after result just add enable the bellow code]
         // verifyEmail()
@@ -139,21 +147,26 @@ const Login = () => {
         toast.success('Account created successfully!', {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
-        // Call JWT function
+        // Call JWT fn
         setJWT(user?.uid);
+        // Disable the overlay loader
+        setOverlayLoading(false);
         // Redirect to targated page or home page
         setTimeout(() => {
           navigate(from, { replace: true });
         }, 1000);
       })
-      .catch((error) => {
+      .catch(error => {
         // Error toast
         toast.error(error.code, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
+        // Disable the overlay loader
+        setOverlayLoading(false);
       });
     };
     
+    // User login form
     if (type === 'login') {
       // Sign in a user with email and password
       logInWithEmailPassword(values.email, values.password)
@@ -166,19 +179,21 @@ const Login = () => {
         });
         // Form reset
         form.reset();
-        // Call JWT function
+        // Call JWT fn
         setJWT(user?.uid);
+        // Disable the overlay loader
+        setOverlayLoading(false);
         // Redirect to targated page or home page
         setTimeout(() => {
           navigate(from, { replace: true });
         }, 1000);
       })
-      .catch((error) => {
+      .catch(error => {
         // Error toast
         toast.error(error.code, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
-        // Disable the overlay loading
+        // Disable the overlay loader
         setOverlayLoading(false);
       });
     };
@@ -186,39 +201,44 @@ const Login = () => {
 
   // Handle social media authentication (Popup)
   const handleSocialAuth = provider => {
-    // Creating user with social media (Popup)
+    // Create user with social media (Popup)
     logInWithPopup(provider)
     .then(result => {
       // Signed in 
       const user = result.user;
-      // Verifying if the user is new or old
+      // Verify user is new or old
       fetch(`${import.meta.env.VITE_API_Server}/user/${user?.uid}`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          // Successful toast [old user]
+          // Successful toast
           toast.success('Logged in successfully!', {
             autoClose: 1500, position: toast.POSITION.TOP_CENTER
           });
-          // Call JWT function
+          // Call JWT fn
           setJWT(user?.uid);
           // Redirect to targated page or home page
           setTimeout(() => {
             navigate(from, { replace: true });
           }, 1000);
         } else {
-          // Uploding the user photo to server [new usre]
+          // Upload user photo to server
           const formData = new FormData();
           formData.append('image', user?.photoURL);
           const url = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMBB_API_KEY}`
           axios.post(url, formData)
           .then(data => {
             if (data.data.success) {
-              // Creating user with email and password function
+              // Call create user fn with email and password
               storeUser(user?.uid, user?.displayName, user?.email, data.data.data.display_url, data.data.data.delete_url, false);
+            } else {
+              // Error toast
+              toast.error(data.data.message, {
+                autoClose: 1500, position: toast.POSITION.TOP_CENTER
+              });
             };
           })
-          .catch((error) => {
+          .catch(error => {
             // Error toast
             toast.error(error.message, {
               autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -228,7 +248,7 @@ const Login = () => {
           toast.success('Account created successfully!', {
             autoClose: 1500, position: toast.POSITION.TOP_CENTER
           });
-          // Call JWT function
+          // Call JWT fn
           setJWT(user?.uid);
           // Redirect to targated page or home page
           setTimeout(() => {
@@ -243,7 +263,7 @@ const Login = () => {
         });
       });
     })
-    .catch((error) => {
+    .catch(error => {
       // Error toast
       toast.error(error.code, {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -251,9 +271,9 @@ const Login = () => {
     });
   };
 
-  // Storing user to the database
+  // Store user to database
   const storeUser = (uid, name, email, photoURL, photoDeleteURL, role) => {
-    // Creating object to send to the database
+    // Create object to send to the database
     const userInfo = {
       uid,
       name,
@@ -263,15 +283,21 @@ const Login = () => {
       role: role ? 'seller' : 'buyer'
     };
 
+    // Store object to database
     axios.post(`${import.meta.env.VITE_API_Server}/add-user`, userInfo)
     .then(data => {
-      if (data.success) {
-        toast.success(data.message, {
+      if (data.data.success) {
+        toast.success(data.data.message, {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
+      } else {
+        // Error toast
+        toast.error(data.data.error, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
       };
     })
-    .catch((error) => {
+    .catch(error => {
       // Error toast
       toast.error(error.message, {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -281,9 +307,9 @@ const Login = () => {
 
   // Handle password reset
   const passwordReset = (e, email) => {
-    // Disabling form default behavior
+    // Disable form default behavior
     e.preventDefault();
-  // Sending email
+    // Send reset email
     passwordResetEmail(email)
     .then(() => {
       // Successful toast
@@ -292,155 +318,158 @@ const Login = () => {
       });
       // Close the modal
       setOpened(false);
-    }).catch((error) => {
+    })
+    .catch(error => {
       // Error toast
-      toast.error(`${error.code}`, {
+      toast.error(error.code, {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
     });
   };
 
-  // Loading until we got the data
+  // Loader until we got the data
   if (loading) {
     return <DataLoader />;
   };
 
-  // When user logged in return to the previous page
+  // When user logged in return to the previous page or home page
   if (user?.uid) {
     return <Navigate to='/' state={{ from: location }} replace />
-  }
+  };
 
   return (
-    <Paper radius="md" p="xl" className="max-w-md mx-auto" withBorder>
-      <Text size="lg" weight={500} align="center" mb={20}>
-        Welcome to BackWatch, {type} with
-      </Text>
+    <section className="mx-4">
+      <Paper radius="md" p="xl" className="max-w-md mx-auto" withBorder>
+        <Text size="lg" weight={500} align="center" mb={20}>
+          Welcome to BackWatch, {type} with
+        </Text>
 
-      <Group grow mb="md" mt="md">
-        <Button
-          size="md"
-          component="a"
-          leftIcon={<IconBrandGoogle size={20} color="#00ACEE" />}
-          variant="default"
-          onClick={() => handleSocialAuth(googleProvider)}
-        >
-          Google
-        </Button>
-        <Button
-          size="md"
-          component="a"
-          leftIcon={<IconBrandTwitter size={20} color="#00ACEE" />}
-          variant="default"
-          onClick={() => handleSocialAuth(twitterProvider)}
-        >
-          Twitter
-        </Button>
-      </Group>
+        <Group grow mb="md" mt="md">
+          <Button
+            size="md"
+            component="a"
+            leftIcon={<IconBrandGoogle size={20} color="#00ACEE" />}
+            variant="default"
+            onClick={() => handleSocialAuth(googleProvider)}
+          >
+            Google
+          </Button>
+          <Button
+            size="md"
+            component="a"
+            leftIcon={<IconBrandTwitter size={20} color="#00ACEE" />}
+            variant="default"
+            onClick={() => handleSocialAuth(twitterProvider)}
+          >
+            Twitter
+          </Button>
+        </Group>
 
-      <Divider label="Or continue with email" labelPosition="center" my="lg" />
+        <Divider label="Or continue with email" labelPosition="center" my="lg" />
 
-      <Box sx={{ maxWidth: 400 }} mx="auto">
-        <form onSubmit={form.onSubmit((values) => { handleSubmit(values); setOverlayLoading((v) => !v) })} style={{ maxWidth: 400, position: 'relative' }}>
-          <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
-          <Stack>
-            {type === 'register' && (
+        <Box style={{ maxWidth: 400, position: 'relative' }} mx="auto">
+          <form onSubmit={form.onSubmit((values) => { handleSubmit(values); setOverlayLoading((v) => !v) })}>
+            <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
+            <Stack>
+              {type === 'register' && (
+                <TextInput
+                  required
+                  label="Name"
+                  placeholder="Your name"
+                  value={form.values.name}
+                  onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
+                />
+              )}
+
               <TextInput
                 required
-                label="Name"
-                placeholder="Your name"
-                value={form.values.name}
-                onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
+                label="Email"
+                placeholder="hi@backwatchshop.web.app"
+                value={form.values.email}
+                onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
+                error={form.errors.email && 'Invalid email'}
               />
-            )}
 
-            <TextInput
-              required
-              label="Email"
-              placeholder="hi@backwatchshop.web.app"
-              value={form.values.email}
-              onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-              error={form.errors.email && 'Invalid email'}
-            />
-
-            <Group style={{ display: 'block' }}>
-              <PasswordInput
-                required
-                label="Password"
-                placeholder="Your password"
-                value={form.values.password}
-                onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
-                error={form.errors.password && 'Password should include at least 6 characters'}
-              />
-              {type === 'login' && (
-                <Anchor
-                  component="button"
-                  type="button"
-                  color="dimmed"
-                  onClick={() => setOpened(true)}
-                  size="xs"
-                >Forgot password?
-                </Anchor>
-              )}
-            </Group>
-
-            {type === 'register' && (
-              <>
-                <FileInput
+              <Group style={{ display: 'block' }}>
+                <PasswordInput
                   required
-                  accept={"image/png,image/jpeg"}
-                  label="Your photo"
-                  placeholder="Your photo"
-                  icon={<IconUpload size={14} />}
-                  value={form.values.image}
-                  onChange={(event) => form.setFieldValue('image', event)}
-                  error={form.errors.image && 'Photo upload is required'}
+                  label="Password"
+                  placeholder="Your password"
+                  value={form.values.password}
+                  onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
+                  error={form.errors.password && 'Password should include at least 6 characters'}
                 />
-                <Switch
-                  defaultChecked={form.values.role}
-                  label="I want to be a seller!"
-                  onChange={(event) => form.setFieldValue('role', event.currentTarget.checked)}
-                />
-              </>
-            )}
-          </Stack>
+                {type === 'login' && (
+                  <Anchor
+                    component="button"
+                    type="button"
+                    color="dimmed"
+                    onClick={() => setOpened(true)}
+                    size="xs"
+                  >Forgot password?
+                  </Anchor>
+                )}
+              </Group>
 
-          <Group position="apart" mt="xl">
-            <Anchor
-              component="button"
-              type="button"
-              color="dimmed"
-              onClick={() => toggle()}
-              size="xs"
-            >
-              {type === 'register'
-                ? 'Already have an account? Login'
-                : "Don't have an account? Register"}
-            </Anchor>
-            <Button type="submit" className="bg-primary hover:bg-secondary">{upperFirst(type)}</Button>
-          </Group>
-        </form>
-      </Box>
-      <Modal
-        centered
-        opened={opened}
-        onClose={() => setOpened(false)}
-        title="Reset Account Password"
-      >
-        <form onSubmit={(e) => passwordReset(e, form.values.email)}>
-          <Stack>
-            <TextInput
-              required
-              label="Email"
-              placeholder="hi@backwatchshop.web.app"
-              value={form.values.email}
-              onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-              error={form.errors.email && 'Invalid email'}
-            />
-          </Stack>
-          <Button type="submit" className="bg-primary hover:bg-secondary" position="apart" mt="md">Reset Password</Button>
-        </form>
-      </Modal>
-    </Paper>
+              {type === 'register' && (
+                <>
+                  <FileInput
+                    required
+                    accept={"image/png,image/jpeg"}
+                    label="Your photo"
+                    placeholder="Your photo"
+                    icon={<IconUpload size={14} />}
+                    value={form.values.image}
+                    onChange={(event) => form.setFieldValue('image', event)}
+                    error={form.errors.image && 'Photo upload is required'}
+                  />
+                  <Switch
+                    defaultChecked={form.values.role}
+                    label="I want to be a seller!"
+                    onChange={(event) => form.setFieldValue('role', event.currentTarget.checked)}
+                  />
+                </>
+              )}
+            </Stack>
+
+            <Group position="apart" mt="xl">
+              <Anchor
+                component="button"
+                type="button"
+                color="dimmed"
+                onClick={() => toggle()}
+                size="xs"
+              >
+                {type === 'register'
+                  ? 'Already have an account? Login'
+                  : "Don't have an account? Register"}
+              </Anchor>
+              <Button type="submit" className="bg-primary hover:bg-secondary">{upperFirst(type)}</Button>
+            </Group>
+          </form>
+        </Box>
+        <Modal
+          centered
+          opened={opened}
+          onClose={() => setOpened(false)}
+          title="Reset Account Password"
+        >
+          <form onSubmit={(e) => passwordReset(e, form.values.email)}>
+            <Stack>
+              <TextInput
+                required
+                label="Email"
+                placeholder="hi@backwatchshop.web.app"
+                value={form.values.email}
+                onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
+                error={form.errors.email && 'Invalid email'}
+              />
+            </Stack>
+            <Button type="submit" className="bg-primary hover:bg-secondary" position="apart" mt="md">Reset Password</Button>
+          </form>
+        </Modal>
+      </Paper>  
+    </section>
   )
 };
 

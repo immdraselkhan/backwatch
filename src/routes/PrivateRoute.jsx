@@ -5,13 +5,13 @@ import DataLoader from '../components/common/DataLoader'
 
 const PrivateRoute = ({children}) => {
 
-  // Getting data from AuthContext
+  // Get data from AuthContext
   const {user, loading} = useContext(AuthContext);
 
   // Get current location
   const location = useLocation();
 
-  // Loading until we got the user
+  // Loader until we got the user
   if (loading) {
     return <DataLoader />;
   };

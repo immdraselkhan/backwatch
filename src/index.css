@@ -17,7 +17,3 @@
     @apply all-classes-here;
   }
 } */
-
-.mantine-YearPickerInput-pickerControl[data-disabled] {
-  display: none;
-}

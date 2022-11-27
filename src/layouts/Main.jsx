@@ -1,6 +1,6 @@
 import React from 'react'
-import ClientHeader from '../components/client/Header'
 import { Outlet } from 'react-router-dom'
+import ClientHeader from '../components/client/Header'
 import ClientFooter from '../components/client/Footer'
 
 const Main = () => {

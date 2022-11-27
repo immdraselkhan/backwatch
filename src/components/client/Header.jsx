@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { AuthContext } from '../../contexts/AuthProvider'
 import { createStyles, Header, Container, Group, Burger, Paper, Transition, Button, ActionIcon, Menu, useMantineColorScheme, Avatar, Box, Text, Loader, Indicator, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { AuthContext } from '../../contexts/AuthProvider'
 import { IconSun, IconMoonStars, IconLogout } from '@tabler/icons'
 import { toast } from 'react-toastify'
 
@@ -79,24 +79,30 @@ const useStyles = createStyles((theme) => ({
 
 const ClientHeader = () => {
 
-  const { loading, user, setUser, userLogOut } = useContext(AuthContext);
+  // Get data from AuthContext
+  const { user, loading, userLogOut } = useContext(AuthContext);
 
   // useNavigate hook
   const navigate = useNavigate();
 
+  // useLocation hook
+  const location = useLocation();
+
+  // Color scheme toggle handler
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const dark = colorScheme === 'dark';
+
+  // Menu state
+  const [opened, { toggle, close }] = useDisclosure(false);
+  const { classes, cx } = useStyles();
+
+  // Menu items data
   const menu = [
     {label: 'Home', link: '/'},
     {label: 'Blog', link: '/blog'},
   ];
 
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  const dark = colorScheme === 'dark';
-
-  const location = useLocation();
-  
-  const [opened, {toggle, close}] = useDisclosure(false);
-  const {classes, cx} = useStyles();
-
+  // Map the menu items
   const menuItems = menu.map(item => (
       <Link key={item.label}
         to={item.link}
@@ -110,34 +116,32 @@ const ClientHeader = () => {
 
   // Sign out
   const logOut = () => {
-    // Set use null
-    setUser(null);
-    // Logged out
+    // User log out
     userLogOut()
-      .then(() => {
-        // Sign-out successful toast
-        toast.success('User logged out!', {
-          autoClose: 1500, position: toast.POSITION.TOP_CENTER
-        });
-        // Redirect to login
-        navigate('/login');
-      }).catch((error) => {
-        // An error happened
+    .then(() => {
+      // Successful toast
+      toast.success('User logged out!', {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
+      // Redirect to login route
+      navigate('/login');
+    })
+    .catch(error => {
+      // Error toast
+      toast.error(error.code, {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    });
   };
 
   return (
-    <Header height={HEADER_HEIGHT} mb={120} className={`${classes.root} sticky`}>
+    <Header height={HEADER_HEIGHT} mb={120} className={`${classes.root} sticky z-[999]`}>
       <Container size="xl" className={classes.header}>
-
-        <Title component={Link} to="/">BackWatch</Title>
-        
+        <Title component={Link} to="/">BW</Title>
         <Group spacing={5} className={classes.links}>
           {menuItems}
         </Group>
-
         <Burger opened={opened} onClick={toggle} className={`${classes.burger} flex-auto ml-3`} size="md" />
-
         <Transition transition="pop-top-right" duration={200} mounted={opened}>
           {(styles) => (
             <Paper className={classes.dropdown} withBorder style={styles}>
@@ -145,7 +149,6 @@ const ClientHeader = () => {
             </Paper>
           )}
         </Transition>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', height: '100%' }}>
           <ActionIcon variant="outline" color={dark ? 'yellow' : 'blue'} onClick={() => toggleColorScheme()} title="Toggle color scheme">
             {dark ? <IconSun size={18} /> : <IconMoonStars size={18} />}

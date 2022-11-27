@@ -1,22 +1,34 @@
 import React, { useContext, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { TextInput, Button, Group, Box, NumberInput, Textarea, Select, FileInput, LoadingOverlay } from '@mantine/core'
+import { useDocumentTitle } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import { YearPickerInput } from 'mantine-dates-6'
 import { IconUpload } from '@tabler/icons'
 import { AuthContext } from '../../contexts/AuthProvider'
-import useAPI from '../../api/useAPI'
-import DataLoader from '../../components/common/DataLoader'
 import axios from 'axios'
+import useAPI from '../../hooks/useAPI'
+import DataLoader from '../../components/common/DataLoader'
 import { toast } from 'react-toastify'
 
 const AddProducts = () => {
 
-  // Getting data from AuthContext
+  // Set page title
+  useDocumentTitle('Add Product - BackWatch');
+
+  // Get data from AuthContext
   const { user, loading } = useContext(AuthContext);
+
+  // useNavigate hook
+  const navigate = useNavigate();
 
   // Overlay loader state
   const [overlayLoading, setOverlayLoading] = useState(false);
 
+  // Get categories from the database
+  const { data: categories, dataLoading } = useAPI('categories');
+
+  // Mantine useForm
   const form = useForm({
     // Form initial values
     initialValues: {
@@ -42,13 +54,10 @@ const AddProducts = () => {
       description: (value) => value.length < 100,
       condition: (value) => !value,
       sellerLocation: (value) => !value,
-    },
+    }
   });
-
-  // Get categories from the database
-  const { data: categories, dataLoading } = useAPI('categories');
   
-  // Handle form submission
+  // Handle form submit
   const handleSubmit = values => {
 
     const formData = new FormData();
@@ -57,7 +66,7 @@ const AddProducts = () => {
     axios.post(url, formData)
     .then(data => {
       if (data.data.success) {
-        // Creating object to send to the database
+        // Create object to send to the database
         const product = {
           title: values.title,
           imageURL: data.data.data.display_url,
@@ -66,6 +75,7 @@ const AddProducts = () => {
           categorySlug: values.categorySlug,
           originalPrice: values.originalPrice,
           resalePrice: values.resalePrice,
+          status: 'In Stock',
           yearOfUse: new Date().getFullYear() - values.yearOfUse.getFullYear(),
           description: values.description,
           condition: values.condition,
@@ -76,6 +86,7 @@ const AddProducts = () => {
           createdAt: new Date().toLocaleString(),
         };
 
+        // Store object to database
         axios.post(`${import.meta.env.VITE_API_Server}/add-product`, product)
         .then(data => {
           if (data.data.success) {
@@ -83,16 +94,34 @@ const AddProducts = () => {
             toast.success(data.data.message, {
               autoClose: 1500, position: toast.POSITION.TOP_CENTER
             });
+            // Form reset
+            form.reset();
+            // Disable the overlay loader
+            setOverlayLoading(false);
+            // Redirect to products route
+            navigate('/dashboard/products');
+          } else {
+            // Error toast
+            toast.error(data.data.error, {
+              autoClose: 1500, position: toast.POSITION.TOP_CENTER
+            });
+            // Disable the overlay loader
+            setOverlayLoading(false);
           };
         })
-        .catch((error) => {
+        .catch(error => {
           // Error toast
           toast.error(error.message, {
             autoClose: 1500, position: toast.POSITION.TOP_CENTER
           });
         });
-        // Form reset
-        form.reset();
+        // Disable the overlay loader
+        setOverlayLoading(false);
+      } else {
+        // Error toast
+        toast.error(data.data.message, {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
         // Disable the overlay loading
         setOverlayLoading(false);
       };
@@ -102,23 +131,23 @@ const AddProducts = () => {
       toast.error(error.message, {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
-      // Disable the overlay loading
+      // Disable the overlay loader
       setOverlayLoading(false);
     });
   };
 
-  // Loading until we got the data
+  // Loader until we got the data
   if (loading || dataLoading) {
     return <DataLoader />;
   };
 
   return (
-    <Box sx={{ maxWidth: 500 }} mx="auto">
-      <form onSubmit={form.onSubmit((values) => { handleSubmit(values); setOverlayLoading((v) => !v) })} style={{ maxWidth: 400, position: 'relative' }}>
+    <Box style={{ maxWidth: 600, position: 'relative' }} mx="auto">
+      <form onSubmit={form.onSubmit((values) => { handleSubmit(values); setOverlayLoading((v) => !v) })} className="space-y-5">
         <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
         <TextInput
           required
-          placeholder="e.g: Apple watch 2"
+          placeholder="e.g: Apple watch 5"
           label="Product name"
           withAsterisk
           value={form.values.title}
@@ -126,9 +155,10 @@ const AddProducts = () => {
         />
 
         <FileInput
+          required
           accept={"image/png,image/jpeg"}
-          label="Watch photo"
-          placeholder="Upload watch photo"
+          label="Product photo"
+          placeholder="Upload product photo"
           icon={<IconUpload size={14} />}
           value={form.values.image}
           onChange={(event) => form.setFieldValue('image', event)}
@@ -219,7 +249,7 @@ const AddProducts = () => {
         />
         
         <Group position="right" mt="md">
-          <Button type="submit" className="bg-primary hover:bg-secondary">Add </Button>
+          <Button type="submit" className="bg-primary hover:bg-secondary">Add Product</Button>
         </Group>
       </form>
     </Box>
