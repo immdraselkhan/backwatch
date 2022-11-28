@@ -287,9 +287,10 @@ const Login = () => {
     axios.post(`${import.meta.env.VITE_API_Server}/add-user`, userInfo)
     .then(data => {
       if (data.data.success) {
-        toast.success(data.data.message, {
-          autoClose: 1500, position: toast.POSITION.TOP_CENTER
-        });
+        // Succssfull toast
+        // toast.success(data.data.message, {
+        //   autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        // });
       } else {
         // Error toast
         toast.error(data.data.error, {
