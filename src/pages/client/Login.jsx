@@ -334,7 +334,7 @@ const Login = () => {
 
   // When user logged in return to the previous page or home page
   if (user?.uid) {
-    return <Navigate to='/' state={{ from: location }} replace />
+    return <Navigate to='/' state={{ from: location }} replace />;
   };
 
   return (

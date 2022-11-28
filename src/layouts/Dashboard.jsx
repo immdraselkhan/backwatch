@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { AppShell } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
 import { AuthContext } from '../contexts/AuthProvider'
@@ -8,6 +8,7 @@ import DashNavbar from '../components/dashboard/DashNavbar'
 import DashFooter from '../components/dashboard/DashFooter'
 import DataLoader from '../components/common/DataLoader'
 import useRole from '../hooks/useRole'
+import { toast } from 'react-toastify'
 
 const Dashboard = () => {
 
@@ -16,6 +17,9 @@ const Dashboard = () => {
 
   // Get data from AuthContext
   const { user, loading } = useContext(AuthContext);
+
+  // useLocation hook
+  const location = useLocation();
 
   // Get user role from the database
   const [role, roleLoading] = useRole(user?.uid);
@@ -26,6 +30,15 @@ const Dashboard = () => {
   // Loader until we got the data
   if (loading || roleLoading) {
     return <DataLoader />;
+  };
+
+  // If no user role found return to home
+  if (!loading && !roleLoading && !role) {
+    // Error toast
+    toast.error('Something went wrong!', {
+      autoClose: 1500, position: toast.POSITION.TOP_CENTER
+    });
+    return <Navigate to='/' state={{ from: location }} replace />;
   };
 
   return (
