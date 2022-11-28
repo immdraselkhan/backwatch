@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import useRole from '../../hooks/useRole'
 import useParamsAPI from '../../hooks/useParamsAPI'
 import DataLoader from '../../components/common/DataLoader'
 import { AuthContext } from '../../contexts/AuthProvider'
@@ -12,10 +11,10 @@ const Products = () => {
   const { user, loading } = useContext(AuthContext);
 
   // Get user role from the database
-  const [role, roleLoading] = useRole(user?.uid);
+  const { data: role, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
 
   // Get categories from the database
-  const { data: products, dataLoading } = useParamsAPI('products', user?.uid);
+  const { data: products, dataLoading: productsLoading } = useParamsAPI('products', user?.uid);
 
   // Map the prducts
   const rows = products?.map((product) => (
@@ -33,13 +32,13 @@ const Products = () => {
   ));
 
   // Loader until we got the data
-  if (loading || roleLoading || dataLoading) {
+  if (loading || roleLoading || productsLoading) {
     return <DataLoader />;
   };
 
   return (
     <>
-      {products.length < 1 ? (
+      {!products?.length || products?.length < 0 ? (
         <div className="flex items-center h-full">
           <img src={NoResultImage} alt="No result found" className="w-96 mx-auto" />
         </div>

@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { AuthContext } from '../contexts/AuthProvider'
-import useRole from '../hooks/useRole'
+import useParamsAPI from '../hooks/useParamsAPI'
 import DataLoader from '../components/common/DataLoader'
 
 const AdminRoute = ({ children }) => {
@@ -9,8 +9,8 @@ const AdminRoute = ({ children }) => {
   // Get data from AuthContext
   const { user, loading } = useContext(AuthContext);
 
-  // Get user role
-  const [role, roleLoading] = useRole(user?.uid);
+  // Get user role from the database
+  const { data: role, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
 
   // useLocation hook
   const location = useLocation();

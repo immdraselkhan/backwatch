@@ -6,8 +6,8 @@ import { AuthContext } from '../contexts/AuthProvider'
 import DashHeader from '../components/dashboard/DashHeader'
 import DashNavbar from '../components/dashboard/DashNavbar'
 import DashFooter from '../components/dashboard/DashFooter'
+import useParamsAPI from '../hooks/useParamsAPI'
 import DataLoader from '../components/common/DataLoader'
-import useRole from '../hooks/useRole'
 import { toast } from 'react-toastify'
 
 const Dashboard = () => {
@@ -22,7 +22,7 @@ const Dashboard = () => {
   const location = useLocation();
 
   // Get user role from the database
-  const [role, roleLoading] = useRole(user?.uid);
+  const { data: role, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
 
   // Navbar state
   const [opened, setOpened] = useState(false);
@@ -32,7 +32,7 @@ const Dashboard = () => {
     return <DataLoader />;
   };
 
-  // If no user role found return to home
+  // If user role not found return to home
   if (!loading && !roleLoading && !role) {
     // Error toast
     toast.error('Something went wrong!', {

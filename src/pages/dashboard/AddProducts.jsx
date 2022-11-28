@@ -26,7 +26,7 @@ const AddProducts = () => {
   const [overlayLoading, setOverlayLoading] = useState(false);
 
   // Get categories from the database
-  const { data: categories, dataLoading } = useAPI('categories');
+  const { data: categories, dataLoading: categoriesLoading } = useAPI('categories');
 
   // Mantine useForm
   const form = useForm({
@@ -137,7 +137,7 @@ const AddProducts = () => {
   };
 
   // Loader until we got the data
-  if (loading || dataLoading) {
+  if (loading || categoriesLoading) {
     return <DataLoader />;
   };
 
