@@ -84,7 +84,7 @@ const ClientFooter = () => {
         <div className={classes.logo}>
           <h1>BackWatch</h1>
           <Text size="sm" color="dimmed" className={classes.description}>
-            Hello! We're BackWatch, the leading marketplace for renewed watches. Our mission? To fight e-waste by giving expertly restored devices a second life.
+            Hello! We're BackWatch, the leading marketplace for renewed watches. Our mission? To fight e-waste by giving expertly restored watchess a second life.
           </Text>
         </div>
       </Container>

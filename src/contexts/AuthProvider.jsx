@@ -76,12 +76,14 @@ const AuthProvider = ({children}) => {
 
   // Sign out
   const userLogOut = () => {
+    // Empty the user state
+    setUser('');
     // Return the firebase api function
     return signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{user, googleProvider, twitterProvider, githubProvider, signupWithEmailPassword, logInWithEmailPassword, logInWithPopup, passwordResetEmail, updateUserProfile, userLogOut, loading, setLoading, setUser}}>
+    <AuthContext.Provider value={{user, googleProvider, twitterProvider, githubProvider, signupWithEmailPassword, logInWithEmailPassword, logInWithPopup, passwordResetEmail, updateUserProfile, userLogOut, loading, setLoading}}>
       {children}
     </AuthContext.Provider>
   )
