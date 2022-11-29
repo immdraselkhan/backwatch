@@ -7,6 +7,7 @@ import { YearPickerInput } from 'mantine-dates-6'
 import { IconUpload } from '@tabler/icons'
 import { AuthContext } from '../../contexts/AuthProvider'
 import axios from 'axios'
+import useParamsAPI from '../../hooks/useParamsAPI'
 import useAPI from '../../hooks/useAPI'
 import DataLoader from '../../components/common/DataLoader'
 import { toast } from 'react-toastify'
@@ -24,6 +25,9 @@ const AddProducts = () => {
 
   // Overlay loader state
   const [overlayLoading, setOverlayLoading] = useState(false);
+
+  // Get user from the database
+  const { data: storedUser, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
 
   // Get categories from the database
   const { data: categories, dataLoading: categoriesLoading } = useAPI('categories');
@@ -84,6 +88,7 @@ const AddProducts = () => {
           sellerLocation: values.sellerLocation,
           sellerName: user?.displayName,
           sellerId: user?.uid,
+          sellerStatus: storedUser?.isVerified,
           createdAt: new Date().toLocaleString(),
         };
 
@@ -138,7 +143,7 @@ const AddProducts = () => {
   };
 
   // Loader until we got the data
-  if (loading || categoriesLoading) {
+  if (loading || categoriesLoading || roleLoading) {
     return <DataLoader />;
   };
 

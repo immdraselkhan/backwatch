@@ -9,8 +9,8 @@ const AdminRoute = ({ children }) => {
   // Get data from AuthContext
   const { user, loading } = useContext(AuthContext);
 
-  // Get user role from the database
-  const { data: role, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
+  // Get user from the database
+  const { data: storedUser, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
 
   // useLocation hook
   const location = useLocation();
@@ -21,7 +21,7 @@ const AdminRoute = ({ children }) => {
   };
 
   // When we got the logged in user and matched the role will return the AdminRoute children
-  if (user?.uid && role === 'admin') {
+  if (user?.uid && storedUser?.role === 'admin') {
     return children;
   };
 

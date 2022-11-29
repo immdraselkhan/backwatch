@@ -2,17 +2,23 @@ import React, { useContext, useState } from 'react'
 import useParamsAPI from '../../hooks/useParamsAPI'
 import DataLoader from '../../components/common/DataLoader'
 import { AuthContext } from '../../contexts/AuthProvider'
-import { Box, Button, FileInput, Group, LoadingOverlay, Modal, NumberInput, Select, Table, Textarea, TextInput } from '@mantine/core'
-import NoResultImage from '../../assets/no-result.png'
+import { Box, Button, Center, FileInput, Group, LoadingOverlay, Modal, NumberInput, Select, Table, Textarea, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconUpload } from '@tabler/icons'
 import { YearPickerInput } from 'mantine-dates-6'
 import useAPI from '../../hooks/useAPI'
-import { toast } from 'react-toastify'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { useDocumentTitle } from '@mantine/hooks'
+import NoResultImage from '../../assets/no-result.png'
+import AdsImage from '../../assets/ads.png'
+import DeleteImage from '../../assets/delete.png'
 
 const Products = () => {
+
+  // Set page title
+  useDocumentTitle('Products - BackWatch');
 
   // Get data from AuthContext
   const { user, loading } = useContext(AuthContext);
@@ -21,13 +27,13 @@ const Products = () => {
   const [overlayLoading, setOverlayLoading] = useState(false);
 
   // Modal state
-  const [modal, setModal] = useState(false);
+  const [modal, setModal] = useState({ ads: false, edit: false, delete: false });
 
   // Clicked product state
   const [clickedProduct, setClickedProduct] = useState({});
 
-  // Get user role from the database
-  const { data: role, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
+  // Get user from the database
+  const { data: storedUser, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
 
   // Get categories from the database
   const { data: categories, dataLoading: categoriesLoading } = useAPI('categories');
@@ -36,9 +42,13 @@ const Products = () => {
   const { data: products, isLoading, refetch } = useQuery({
     queryKey: ['products', user?.uid],
     queryFn: () => axios.get(`${import.meta.env.VITE_API_Server}/products/${user?.uid}`)
-    .then(data => {
-      return data.data.result;
-    }),
+      .then(data => {
+        if (data.data.success) {
+          return data.data.result;
+        } else {
+          return [];
+        };
+      }),
   });
 
   // Destructure clicked product
@@ -83,7 +93,7 @@ const Products = () => {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
       // Close the modal
-      setModal(false);
+      setModal({edit: false});
       // Return the submit
       return;
     };
@@ -94,30 +104,30 @@ const Products = () => {
       formData.append('image', values.imageURL);
       const url = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMBB_API_KEY}`
       axios.post(url, formData)
-      .then(data => {
-        if (data.data.success) {
-          // Replace image url and image delete url
-          form.values['imageURL'] = data.data.data.display_url;
-          form.values['imageDeleteURL'] = data.data.data.delete_url;
-          // Call update product fn
-          updateProduct(values);
-        } else {
+        .then(data => {
+          if (data.data.success) {
+            // Replace image url and image delete url
+            form.values['imageURL'] = data.data.data.display_url;
+            form.values['imageDeleteURL'] = data.data.data.delete_url;
+            // Call update product fn
+            updateProduct(values);
+          } else {
+            // Error toast
+            toast.error(data.data.message, {
+              autoClose: 1500, position: toast.POSITION.TOP_CENTER
+            });
+            // Disable the overlay loading
+            setOverlayLoading(false);
+          };
+        })
+        .catch(error => {
           // Error toast
-          toast.error(data.data.message, {
+          toast.error(error.message, {
             autoClose: 1500, position: toast.POSITION.TOP_CENTER
           });
-          // Disable the overlay loading
+          // Disable the overlay loader
           setOverlayLoading(false);
-        };
-      })
-      .catch(error => {
-        // Error toast
-        toast.error(error.message, {
-          autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
-        // Disable the overlay loader
-        setOverlayLoading(false);
-      });
     } else {
       // Call update product fn except image field touched
       updateProduct(form.values);
@@ -141,7 +151,7 @@ const Products = () => {
         // Refetch products
         refetch();
         // Close the modal
-        setModal(false);
+        setModal({edit: false});
         // Disable the overlay loader
         setOverlayLoading(false);
       } else {
@@ -163,6 +173,70 @@ const Products = () => {
     setOverlayLoading(false);
   };
 
+  // Publish ads
+  const publishAds = () => {
+    // Create object
+    const product = {isAds: true};
+    // Update object from database
+    axios.patch(`${import.meta.env.VITE_API_Server}/update-product/${_id}`, product)
+    .then(data => {
+      if (data.data.success) {
+        // Successful toast
+        toast.success('Ads successfully published!', {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
+        // Refetch products
+        refetch();
+        // Close the modal
+        setModal({ads: false});
+      } else {
+        // Error toast
+        toast.error('Ads published error!', {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
+      };
+    })
+    .catch(error => {
+      // Error toast
+      toast.error(error.message, {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    });
+    // Close the modal
+    setModal({ads: false});
+  };
+
+  // Delete product
+  const deleteProduct = () => {
+    // Delete object from database
+    axios.delete(`${import.meta.env.VITE_API_Server}/delete-product/${_id}`)
+    .then(data => {
+      if (data.data.success) {
+        // Successful toast
+        toast.success(data.data.message, {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
+        // Refetch products
+        refetch();
+        // Close the modal
+        setModal({delete: false});
+      } else {
+        // Error toast
+        toast.error(data.data.message, {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
+      };
+    })
+    .catch(error => {
+      // Error toast
+      toast.error(error.message, {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    });
+    // Close the modal
+    setModal({delete: false});
+  };
+
   // Map the products
   const rows = products?.map((product) => (
     <tr key={product._id}>
@@ -176,12 +250,14 @@ const Products = () => {
       <td>{product.status}</td>
       <td>
         <Button.Group>
-          {role !== 'admin' &&
+          {storedUser?.role !== 'admin' &&
           <>
-            <Button color="green" compact>Adversite</Button>
-            {product.status === 'In Stock' ? <Button color="yellow" compact onClick={() => { setModal(true); setClickedProduct(product); form.setValues((prev) => ({ ...prev, ...product })) }}>Edit</Button> : <Button color="yellow" compact disabled>Edit</Button> }
+            {!product?.isAds ? <Button color="green" compact onClick={() => {setModal({ ads: true }); setClickedProduct(product)}}>Adversite</Button> : <Button color="green" className="!text-gray-400" compact disabled>Ads published</Button>}
+            {product?.status === 'In Stock' ? <Button color="yellow" compact onClick={() => {setModal({ edit: true }); setClickedProduct(product); form.setValues((prev) => ({ ...prev, ...product }))}}>Edit</Button> : <Button color="yellow" className="!text-gray-400" compact disabled>Edit</Button>}
           </>}
-          <Button color="red" compact>Delete</Button>
+          {storedUser?.role === 'admin' &&
+            <Button color="red" compact onClick={() => {setModal({ delete: true }); setClickedProduct(product)}}>Delete</Button>
+          }
         </Button.Group>
       </td>
     </tr>
@@ -216,10 +292,11 @@ const Products = () => {
         <tbody>{rows}</tbody>
       </Table>}
       <Modal
-        opened={modal}
-        onClose={() => setModal(false)}
+        opened={modal.edit}
+        onClose={() => setModal({edit: false})}
         title="Edit product"
         closeOnClickOutside={false}
+        centered
       >
         <Box style={{ maxWidth: 600, position: 'relative' }} mx="auto">
           <form onSubmit={form.onSubmit((values) => {handleSubmit(values); setOverlayLoading(form.isTouched())})} className="space-y-5">
@@ -332,6 +409,34 @@ const Products = () => {
               <Button type="submit">Update Product</Button>
             </Group>
           </form>
+        </Box>
+      </Modal>
+      <Modal
+        opened={modal.ads}
+        onClose={() => setModal({ads: false})}
+        closeOnClickOutside={false}
+        centered
+      >
+        <Box className="relative pb-5 mx-auto space-y-10">
+          <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
+          <img src={AdsImage} alt="" className="w-48 mx-auto" />
+          <Center>
+            <Button variant="gradient" gradient={{ from: 'teal', to: 'blue', deg: 60 }} onClick={publishAds}>Publish Ads For Free</Button>
+          </Center>
+        </Box>
+      </Modal>
+      <Modal
+        opened={modal.delete}
+        onClose={() => setModal({delete: false})}
+        closeOnClickOutside={false}
+        centered
+      >
+        <Box className="relative pb-5 mx-auto space-y-10">
+          <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
+          <img src={DeleteImage} alt="Delete alert" className="w-24 mx-auto" />
+          <Center>
+            <Button variant="gradient" gradient={{ from: 'red', to: 'orange' }} onClick={deleteProduct}>Confirm Delete</Button>
+          </Center>
         </Box>
       </Modal>
     </>

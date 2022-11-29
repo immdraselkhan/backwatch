@@ -280,7 +280,8 @@ const Login = () => {
       email,
       photoURL,
       photoDeleteURL,
-      role: role ? 'seller' : 'buyer'
+      role: role ? 'seller' : 'buyer',
+      isVerified: false,
     };
 
     // Store object to database

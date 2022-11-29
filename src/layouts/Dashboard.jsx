@@ -21,8 +21,8 @@ const Dashboard = () => {
   // useLocation hook
   const location = useLocation();
 
-  // Get user role from the database
-  const { data: role, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
+  // Get user from the database
+  const { data: storedUser, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
 
   // Navbar state
   const [opened, setOpened] = useState(false);
@@ -33,7 +33,7 @@ const Dashboard = () => {
   };
 
   // If user role not found return to home
-  if (!loading && !roleLoading && !role) {
+  if (!loading && !roleLoading && !storedUser?.role) {
     // Error toast
     toast.error('Something went wrong!', {
       autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -43,8 +43,8 @@ const Dashboard = () => {
 
   return (
     <AppShell navbarOffsetBreakpoint="sm"
-      navbar={<DashNavbar opened={opened} role={role} />}
-      header={<DashHeader opened={opened} setOpened={setOpened} role={role} />}
+      navbar={<DashNavbar opened={opened} role={storedUser?.role} />}
+      header={<DashHeader opened={opened} setOpened={setOpened} role={storedUser?.role} />}
       footer={<DashFooter />}>
       <Outlet />
     </AppShell>
