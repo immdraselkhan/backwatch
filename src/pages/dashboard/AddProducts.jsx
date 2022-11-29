@@ -38,7 +38,7 @@ const AddProducts = () => {
       categorySlug: '',
       originalPrice: '',
       resalePrice: '',
-      yearOfUse: '',
+      yearOfPurchase: '',
       description: '',
       condition: '',
       sellerNumber: '',
@@ -50,8 +50,8 @@ const AddProducts = () => {
       category: (value) => !value,
       originalPrice: (value) => value < form.values.resalePrice,
       resalePrice: (value) => form.values.originalPrice < value,
-      yearOfUse: (value) => !value,
-      description: (value) => value.length < 100,
+      yearOfPurchase: (value) => !value,
+      description: (value) => value?.length < 100,
       condition: (value) => !value,
       sellerLocation: (value) => !value,
     }
@@ -76,7 +76,8 @@ const AddProducts = () => {
           originalPrice: values.originalPrice,
           resalePrice: values.resalePrice,
           status: 'In Stock',
-          yearOfUse: new Date().getFullYear() - values.yearOfUse.getFullYear(),
+          yearOfUse: new Date().getFullYear() - values.yearOfPurchase.getFullYear(),
+          yearOfPurchase: values.yearOfPurchase.getFullYear(),
           description: values.description,
           condition: values.condition,
           sellerNumber: values.sellerNumber,
@@ -126,7 +127,7 @@ const AddProducts = () => {
         setOverlayLoading(false);
       };
     })
-    .catch((error) => {
+    .catch(error => {
       // Error toast
       toast.error(error.message, {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -143,7 +144,7 @@ const AddProducts = () => {
 
   return (
     <Box style={{ maxWidth: 600, position: 'relative' }} mx="auto">
-      <form onSubmit={form.onSubmit((values) => { handleSubmit(values); setOverlayLoading((v) => !v) })} className="space-y-5">
+      <form onSubmit={form.onSubmit((values) => {handleSubmit(values); setOverlayLoading(true)})} className="space-y-5">
         <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
         <TextInput
           required
@@ -196,13 +197,13 @@ const AddProducts = () => {
         />
 
         <YearPickerInput
-          label={`Year of purchase: ${form.values.yearOfUse ? form.values.yearOfUse.getFullYear() : new Date().getFullYear()}`}
+          label={`Year of purchase: ${form.values.yearOfPurchase ? form.values.yearOfPurchase.getFullYear() : new Date().getFullYear()}`}
           placeholder="e.g: 2020"
           maxDate={`${new Date().getFullYear()}`}
           withAsterisk
-          value={form.values.yearOfUse || new Date()}
-          onChange={(event) => form.setFieldValue('yearOfUse', event)}
-          error={form.errors.yearOfUse && 'Select year of purchase'}
+          value={form.values.yearOfPurchase || new Date()}
+          onChange={(event) => form.setFieldValue('yearOfPurchase', event)}
+          error={form.errors.yearOfPurchase && 'Select year of purchase'}
         />
 
         <Textarea
@@ -249,7 +250,7 @@ const AddProducts = () => {
         />
         
         <Group position="right" mt="md">
-          <Button type="submit" className="bg-primary hover:bg-secondary">Add Product</Button>
+          <Button type="submit">Add Product</Button>
         </Group>
       </form>
     </Box>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { MantineProvider, ColorSchemeProvider } from '@mantine/core'
+import { MantineProvider, ColorSchemeProvider, createEmotionCache } from '@mantine/core'
 import { useHotkeys, useLocalStorage } from '@mantine/hooks'
 
 const ThemeProvider = ({ children }) => {
@@ -21,9 +21,12 @@ const ThemeProvider = ({ children }) => {
   // Ctrl/⌘ + J keyboard shortcut for color scheme toggle
   useHotkeys([['mod+J', () => toggleColorScheme()]]);
 
+  // Emotion cache options to make Mantine styles override
+  const myCache = createEmotionCache({ key: 'mantine' });
+
   return (
     <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-      <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
+      <MantineProvider theme={{ colorScheme }} emotionCache={myCache} withGlobalStyles withNormalizeCSS>
         {children}
       </MantineProvider>
     </ColorSchemeProvider>

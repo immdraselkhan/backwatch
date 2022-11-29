@@ -107,12 +107,8 @@ const ClientFooter = () => {
       <Affix position={{ bottom: 50, right: 20 }}>
         <Transition transition="slide-up" mounted={scroll.y > 0}>
           {(transitionStyles) => (
-            <Button
-              className="p-[10px] bg-primary hover:bg-secondary"
-              style={transitionStyles}
-              onClick={() => scrollTo({ y: 0 })}
-            >
-            <IconArrowUp size={16} />
+            <Button px={10} style={transitionStyles} onClick={() => scrollTo({ y: 0 })}>
+              <IconArrowUp size={16} />
             </Button>
           )}
         </Transition>

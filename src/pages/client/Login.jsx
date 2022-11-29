@@ -445,7 +445,7 @@ const Login = () => {
                   ? 'Already have an account? Login'
                   : "Don't have an account? Register"}
               </Anchor>
-              <Button type="submit" className="bg-primary hover:bg-secondary">{upperFirst(type)}</Button>
+              <Button type="submit">{upperFirst(type)}</Button>
             </Group>
           </form>
         </Box>
@@ -466,7 +466,7 @@ const Login = () => {
                 error={form.errors.email && 'Invalid email'}
               />
             </Stack>
-            <Button type="submit" className="bg-primary hover:bg-secondary" position="apart" mt="md">Reset Password</Button>
+            <Button type="submit" position="apart" mt="md">Reset Password</Button>
           </form>
         </Modal>
       </Paper>  
