@@ -11,7 +11,7 @@ https://backwatchshop.web.app/dashbaord
 ```
 #### adminEmail
 ```
-admin@backwatchshop.web.app
+immdraselkhan@gmail.com
 ```
 #### adminPassword
 ```

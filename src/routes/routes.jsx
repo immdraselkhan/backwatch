@@ -5,6 +5,7 @@ import Login from '../pages/client/Login'
 import Main from '../layouts/Main'
 import Dashboard from '../layouts/Dashboard'
 import Home from '../pages/client/Home'
+import CategoryProducts from '../pages/client/CategoryProducts'
 import DashHome from '../pages/dashboard/DashHome'
 import AddProducts from '../pages/dashboard/AddProducts'
 import Products from '../pages/dashboard/Products'
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
       {
         path: '/',
         element: <Home />
+      },
+      {
+        path: '/category/:slug',
+        element: <PrivateRoute><CategoryProducts /></PrivateRoute>
       },
       {
         path: '/login',

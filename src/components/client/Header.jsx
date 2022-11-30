@@ -5,6 +5,8 @@ import { createStyles, Header, Container, Group, Burger, Paper, Transition, Butt
 import { useDisclosure } from '@mantine/hooks'
 import { IconSun, IconMoonStars, IconLogout } from '@tabler/icons'
 import { toast } from 'react-toastify'
+import LogoDark from '../../assets/logo.svg'
+import LogoLight from '../../assets/logo-light.svg'
 
 const HEADER_HEIGHT = 60;
 
@@ -92,6 +94,8 @@ const ClientHeader = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
 
+  console.log(colorScheme);
+
   // Menu state
   const [opened, { toggle, close }] = useDisclosure(false);
   const { classes, cx } = useStyles();
@@ -137,7 +141,7 @@ const ClientHeader = () => {
   return (
     <Header height={HEADER_HEIGHT} mb={120} className={`${classes.root} sticky z-[999]`}>
       <Container size="xl" className={classes.header}>
-        <Title component={Link} to="/">BW</Title>
+        <img component={Link} to="/" src={colorScheme === 'dark' ? LogoLight : LogoDark} alt="Logo" width={100} />
         <Group spacing={5} className={classes.links}>
           {menuItems}
         </Group>

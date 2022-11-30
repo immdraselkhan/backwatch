@@ -23,7 +23,7 @@ const Buyers = () => {
   // Clicked buyer state
   const [clickedBuyer, setClickedBuyer] = useState({});
 
-  // // Get user from the database
+  // Get user from the database
   const { data: storedUser, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
 
   // Get buyers from the database
@@ -92,6 +92,7 @@ const Buyers = () => {
       </td>
       <td>{buyer?.name}</td>
       <td>{buyer?.email}</td>
+      <td>{buyer?.uid}</td>
       <td>
         {storedUser?.role === 'admin' && <Button onClick={() => { setClickedBuyer(buyer); setModal(true) }} variant="gradient" gradient={{ from: 'red', to: 'orange' }} compact>Delete</Button>}
       </td>
@@ -116,6 +117,7 @@ const Buyers = () => {
             <th>Photo</th>
             <th>Name</th>
             <th>Email</th>
+            <th>ID</th>
             {storedUser?.role === 'admin' && <th>Action</th>}
           </tr>
         </thead>
