@@ -23,6 +23,10 @@ const useAPI = endpoint => {
       setDataLoading(false);
     });
   }, [endpoint]);
+  // Delay response
+  setTimeout(() => {
+    setDataLoading(false);
+  }, 10000);
   // Return the data
   return {data, dataLoading};
 };

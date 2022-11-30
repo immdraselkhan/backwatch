@@ -120,17 +120,19 @@ const Login = () => {
       .then(userCredential => {
         // Signed in
         const user = userCredential.user;
+        // Call JWT fn
+        setJWT(user?.uid);
         // Update the user profile
         updateUserProfile({ displayName: name, photoURL: image })
-          .then(() => {
-            // Profile updated!
-          })
-          .catch(error => {
-            // Error toast
-            toast.error(error.code, {
-              autoClose: 1500, position: toast.POSITION.TOP_CENTER
-            });
+        .then(() => {
+          // Profile updated!
+        })
+        .catch(error => {
+          // Error toast
+          toast.error(error.code, {
+            autoClose: 1500, position: toast.POSITION.TOP_CENTER
           });
+        });
         // Call store user fn to database
         storeUser(user?.uid, name, email, image, deleteImage, role);
         // Send verification email [skipped for this assignment, after result just add enable the bellow code]
@@ -147,8 +149,6 @@ const Login = () => {
         toast.success('Account created successfully!', {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
-        // Call JWT fn
-        setJWT(user?.uid);
         // Disable the overlay loader
         setOverlayLoading(false);
         // Redirect to targated page or home page
@@ -171,16 +171,16 @@ const Login = () => {
       // Sign in a user with email and password
       logInWithEmailPassword(values.email, values.password)
       .then(userCredential => {
-        // Signed in 
+        // Signed in
         const user = userCredential.user;
+        // Call JWT fn
+        setJWT(user?.uid);
         // Successful toast
         toast.success('Logged in successfully!', {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
         // Form reset
         form.reset();
-        // Call JWT fn
-        setJWT(user?.uid);
         // Disable the overlay loader
         setOverlayLoading(false);
         // Redirect to targated page or home page
@@ -204,8 +204,10 @@ const Login = () => {
     // Create user with social media (Popup)
     logInWithPopup(provider)
     .then(result => {
-      // Signed in 
+      // Signed in
       const user = result.user;
+      // Call JWT fn
+      setJWT(user?.uid);
       // Verify user is new or old
       fetch(`${import.meta.env.VITE_API_Server}/user/${user?.uid}`)
       .then(res => res.json())
@@ -248,8 +250,6 @@ const Login = () => {
           toast.success('Account created successfully!', {
             autoClose: 1500, position: toast.POSITION.TOP_CENTER
           });
-          // Call JWT fn
-          setJWT(user?.uid);
           // Redirect to targated page or home page
           setTimeout(() => {
             navigate(from, { replace: true });

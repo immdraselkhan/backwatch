@@ -23,6 +23,10 @@ const useParamsAPI = (endpoint, params) => {
       setDataLoading(false);
     });
   }, [endpoint, params]);
+  // Delay response
+  setTimeout(() => {
+    setDataLoading(false);
+  }, 10000);
   // Return the data
   return {data, dataLoading};
 };

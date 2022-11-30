@@ -39,16 +39,29 @@ const Products = () => {
   const { data: categories, dataLoading: categoriesLoading } = useAPI('categories');
 
   // Get products from the database
-  const { data: products, isLoading, refetch } = useQuery({
+  const { data: products = [], isLoading, refetch } = useQuery({
     queryKey: ['products', user?.uid],
-    queryFn: () => axios.get(`${import.meta.env.VITE_API_Server}/products/${user?.uid}`)
-      .then(data => {
-        if (data.data.success) {
-          return data.data.result;
-        } else {
-          return [];
-        };
-      }),
+    queryFn: () =>
+    fetch(`${import.meta.env.VITE_API_Server}/products/${user?.uid}`, {
+      headers: {authorization: `Bearer ${localStorage.getItem('token')}`}
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        return data.result;
+      } else {
+        // Error toast
+        toast.error(data.error, {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
+        });
+      };
+    })
+    .catch(error => {
+      // Error toast
+      toast.error(error.message, {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    })
   });
 
   // Destructure clicked product
@@ -77,7 +90,7 @@ const Products = () => {
       originalPrice: (value) => value < form.values.resalePrice,
       resalePrice: (value) => form.values.originalPrice < value,
       yearOfPurchase: (value) => !value,
-      description: (value) => value?.length < 100,
+      description: (value) => value?.length < 100 || value?.length > 500,
       condition: (value) => !value,
       sellerLocation: (value) => !value,
     }
@@ -141,11 +154,19 @@ const Products = () => {
     // Update yearOfUse property
     product.yearOfUse = new Date().getFullYear() - product.yearOfPurchase;
     // Update object from database
-    axios.patch(`${import.meta.env.VITE_API_Server}/update-product/${_id}`, product)
+    fetch(`${import.meta.env.VITE_API_Server}/update-product/${_id}`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(product)
+    })
+    .then(res => res.json())
     .then(data => {
-      if (data.data.success) {
+      if (data.success) {
         // Successful toast
-        toast.success(data.data.message, {
+        toast.success(data.message, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
         // Refetch products
@@ -156,7 +177,7 @@ const Products = () => {
         setOverlayLoading(false);
       } else {
         // Error toast
-        toast.error(data.data.error, {
+        toast.error(data.error, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
         // Disable the overlay loader
@@ -173,14 +194,22 @@ const Products = () => {
     setOverlayLoading(false);
   };
 
-  // Publish ads
+  // Handle publish ads
   const publishAds = () => {
     // Create object
     const product = {isAds: true};
     // Update object from database
-    axios.patch(`${import.meta.env.VITE_API_Server}/update-product/${_id}`, product)
+    fetch(`${import.meta.env.VITE_API_Server}/update-product/${_id}`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(product)
+    })
+    .then(res => res.json())
     .then(data => {
-      if (data.data.success) {
+      if (data.success) {
         // Successful toast
         toast.success('Ads successfully published!', {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
@@ -202,18 +231,19 @@ const Products = () => {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
     });
-    // Close the modal
-    setModal({ads: false});
   };
 
-  // Delete product
+  // Handle delete product
   const deleteProduct = () => {
-    // Delete object from database
-    axios.delete(`${import.meta.env.VITE_API_Server}/delete-product/${_id}`)
+    fetch(`${import.meta.env.VITE_API_Server}/delete-product/${_id}`, {
+      method: 'DELETE',
+      headers: {authorization: `Bearer ${localStorage.getItem('token')}`}
+    })
+    .then(res => res.json())
     .then(data => {
-      if (data.data.success) {
+      if (data.success) {
         // Successful toast
-        toast.success(data.data.message, {
+        toast.success(data.message, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
         // Refetch products
@@ -222,7 +252,7 @@ const Products = () => {
         setModal({delete: false});
       } else {
         // Error toast
-        toast.error(data.data.message, {
+        toast.error(data.error, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
       };
@@ -233,8 +263,6 @@ const Products = () => {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
     });
-    // Close the modal
-    setModal({delete: false});
   };
 
   // Map the products
@@ -371,7 +399,7 @@ const Products = () => {
               withAsterisk
               value={form.values.description}
               onChange={(event) => form.setFieldValue('description', event.currentTarget.value)}
-              error={form.errors.description && 'Minimum 100 character'}
+              error={form.errors.description && 'Minimum 100 and maximum 500 character'}
             />
 
             <Select
@@ -418,7 +446,6 @@ const Products = () => {
         centered
       >
         <Box className="relative pb-5 mx-auto space-y-10">
-          <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
           <img src={AdsImage} alt="" className="w-48 mx-auto" />
           <Center>
             <Button variant="gradient" gradient={{ from: 'teal', to: 'blue', deg: 60 }} onClick={publishAds}>Publish Ads For Free</Button>
@@ -432,7 +459,6 @@ const Products = () => {
         centered
       >
         <Box className="relative pb-5 mx-auto space-y-10">
-          <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
           <img src={DeleteImage} alt="Delete alert" className="w-24 mx-auto" />
           <Center>
             <Button variant="gradient" gradient={{ from: 'red', to: 'orange' }} onClick={deleteProduct}>Confirm Delete</Button>

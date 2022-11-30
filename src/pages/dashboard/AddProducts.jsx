@@ -55,7 +55,7 @@ const AddProducts = () => {
       originalPrice: (value) => value < form.values.resalePrice,
       resalePrice: (value) => form.values.originalPrice < value,
       yearOfPurchase: (value) => !value,
-      description: (value) => value?.length < 100,
+      description: (value) => value?.length < 100 || value?.length > 500,
       condition: (value) => !value,
       sellerLocation: (value) => !value,
     }
@@ -88,7 +88,7 @@ const AddProducts = () => {
           sellerLocation: values.sellerLocation,
           sellerName: user?.displayName,
           sellerId: user?.uid,
-          sellerStatus: storedUser?.isVerified,
+          isVerified: storedUser?.isVerified,
           createdAt: new Date().toLocaleString(),
         };
 
@@ -220,7 +220,7 @@ const AddProducts = () => {
           withAsterisk
           value={form.values.description}
           onChange={(event) => form.setFieldValue('description', event.currentTarget.value)}
-          error={form.errors.description && 'Minimum 100 character'}
+          error={form.errors.description && 'Minimum 100 and maximum 500 character'}
         />
 
         <Select
