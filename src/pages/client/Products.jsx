@@ -46,15 +46,35 @@ const Products = () => {
   const [clickedProduct, setClickedProduct] = useState({});
 
   // Handle booking error
-  const handleError = product => {
-    product?.status === 'Booked' ?
-    // Error toast
+  const handleBookingError = product => {
+    if (storedUser?.role === 'admin') {
+      // Error toast
+      toast.error('Admin can\'t book!', {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    } else if (product?.sellerId === user?.uid) {
+      // Error toast
+      toast.error('Can\'t book your own product!', {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    } else {
+      // Error toast
       toast.error('Already booked!', {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
-      }) :
+      });
+    };
+  };
+
+  // Handle report error
+  const handleReportError = () => {
+    storedUser?.role === 'admin' ?
     // Error toast
-    toast.error('Please login as buyer to book!', {
+    toast.error('Admin can\'t report!', {
       autoClose: 1500, position: toast.POSITION.TOP_CENTER
+    }) :
+    // Error toast
+    toast.error('Can\'t report your own product!', {
+    autoClose: 1500, position: toast.POSITION.TOP_CENTER
     });
   };
 
@@ -68,7 +88,7 @@ const Products = () => {
       <Title order={2}>All {categoryInfo?.name} Watches</Title>
       <Text mx="auto" align="center" mt={15} style={{maxWidth: '600px'}} color="dimmed">{categoryInfo?.description}</Text>
       <Grid>
-        {products?.map(product => <ProductCard key={product?._id} product={product} user={user} storedUser={storedUser} setClickedProduct={setClickedProduct} setModal={setModal} handleError={handleError} />)}
+        {products?.map(product => <ProductCard key={product?._id} product={product} user={user} storedUser={storedUser} setClickedProduct={setClickedProduct} setModal={setModal} handleBookingError={handleBookingError} handleReportError={handleReportError} />)}
         <ProductAction user={user} modal={modal} setModal={setModal} clickedProduct={clickedProduct} setClickedProduct={setClickedProduct} overlayLoading={overlayLoading} setOverlayLoading={setOverlayLoading} />
       </Grid>
     </Container>

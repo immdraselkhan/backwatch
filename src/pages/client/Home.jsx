@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Container, Grid, Text, Title, SimpleGrid, ThemeIcon, Col } from '@mantine/core'
 import { Carousel } from '@mantine/carousel'
-import { IconReceiptRefund, IconBuildingStore, IconMoodWink,  IconPlant } from '@tabler/icons'
+import { IconReceiptRefund, IconBuildingStore, IconMoodWink, IconPlant } from '@tabler/icons'
 import { AuthContext } from '../../contexts/AuthProvider'
 import useParamsAPI from '../../hooks/useParamsAPI'
 import useAPI from '../../hooks/useAPI'
@@ -29,7 +29,7 @@ const Home = () => {
   const { data, dataLoading: proeductsLoading } = useAPI('products');
 
   // Filter the products
-  const products = data?.filter(product => product?.isAds);
+  const products = data?.filter(product => product?.isAds && product?.status !== 'Sold Out');
 
   // Features data
   const features = [
@@ -76,15 +76,35 @@ const Home = () => {
   const [clickedProduct, setClickedProduct] = useState({});
 
   // Handle booking error
-  const handleError = product => {
-    product?.status === 'Booked' ?
-    // Error toast
+  const handleBookingError = product => {
+    if (storedUser?.role === 'admin') {
+      // Error toast
+      toast.error('Admin can\'t book!', {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    } else if (product?.sellerId === user?.uid) {
+      // Error toast
+      toast.error('Can\'t book your own product!', {
+        autoClose: 1500, position: toast.POSITION.TOP_CENTER
+      });
+    } else {
+      // Error toast
       toast.error('Already booked!', {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
-      }) :
+      });
+    };
+  };
+
+  // Handle report error
+  const handleReportError = () => {
+    storedUser?.role === 'admin' ?
     // Error toast
-    toast.error('Please login as buyer to book!', {
+    toast.error('Admin can\'t report!', {
       autoClose: 1500, position: toast.POSITION.TOP_CENTER
+    }) :
+    // Error toast
+    toast.error('Can\'t report your own product!', {
+    autoClose: 1500, position: toast.POSITION.TOP_CENTER
     });
   };
 
@@ -130,7 +150,7 @@ const Home = () => {
         <Title order={2}>Advertised Collection</Title>
         <Text order={3} mt={15} size={18} color="dimmed">Classy devices at sassy prices for limited time, grab it now!</Text>
         <Grid>
-          {products?.map(product => <ProductCard key={product?._id} product={product} user={user} storedUser={storedUser} clickedProduct={clickedProduct} setClickedProduct={setClickedProduct} setModal={setModal} handleError={handleError} />)}
+          {products?.map(product => <ProductCard key={product?._id} product={product} user={user} storedUser={storedUser} clickedProduct={clickedProduct} setClickedProduct={setClickedProduct} setModal={setModal} handleBookingError={handleBookingError} handleReportError={handleReportError} />)}
           <ProductAction user={user} modal={modal} setModal={setModal} clickedProduct={clickedProduct} setClickedProduct={setClickedProduct} overlayLoading={overlayLoading} setOverlayLoading={setOverlayLoading} />
         </Grid>
       </Container> : false}

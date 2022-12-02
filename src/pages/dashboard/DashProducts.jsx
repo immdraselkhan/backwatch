@@ -65,7 +65,7 @@ const DashProducts = () => {
   });
 
   // Destructure clicked product
-  const { _id, title, imageURL, category, categorySlug, originalPrice, resalePrice, yearOfPurchase, description, condition, sellerNumber, sellerLocation } = clickedProduct;
+  const { _id, title, imageURL, category, categorySlug, originalPrice, resalePrice, yearOfPurchase, description, condition, sellerNumber, sellerLocation, status } = clickedProduct;
   
   // Mantine useForm
   const form = useForm({
@@ -82,6 +82,7 @@ const DashProducts = () => {
       condition,
       sellerNumber,
       sellerLocation,
+      status,
     },
     // Form validation
     validate: {
@@ -93,6 +94,7 @@ const DashProducts = () => {
       description: (value) => value?.length < 100 || value?.length > 500,
       condition: (value) => !value,
       sellerLocation: (value) => !value,
+      status: (value) => !value,
     }
   });
 
@@ -117,30 +119,30 @@ const DashProducts = () => {
       formData.append('image', values.imageURL);
       const url = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMBB_API_KEY}`
       axios.post(url, formData)
-        .then(data => {
-          if (data.data.success) {
-            // Replace image url and image delete url
-            form.values['imageURL'] = data.data.data.display_url;
-            form.values['imageDeleteURL'] = data.data.data.delete_url;
-            // Call update product fn
-            updateProduct(values);
-          } else {
-            // Error toast
-            toast.error(data.data.message, {
-              autoClose: 1500, position: toast.POSITION.TOP_CENTER
-            });
-            // Disable the overlay loading
-            setOverlayLoading(false);
-          };
-        })
-        .catch(error => {
+      .then(data => {
+        if (data.data.success) {
+          // Replace image url and image delete url
+          form.values['imageURL'] = data.data.data.display_url;
+          form.values['imageDeleteURL'] = data.data.data.delete_url;
+          // Call update product fn
+          updateProduct(values);
+        } else {
           // Error toast
-          toast.error(error.message, {
+          toast.error(data.data.message, {
             autoClose: 1500, position: toast.POSITION.TOP_CENTER
           });
-          // Disable the overlay loader
+          // Disable the overlay loading
           setOverlayLoading(false);
+        };
+      })
+      .catch(error => {
+        // Error toast
+        toast.error(error.message, {
+          autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
+        // Disable the overlay loader
+        setOverlayLoading(false);
+      });
     } else {
       // Call update product fn except image field touched
       updateProduct(form.values);
@@ -283,7 +285,7 @@ const DashProducts = () => {
         <Button.Group>
           {storedUser?.role !== 'admin' &&
           <>
-            {!product?.isAds ? <Button color="green" compact onClick={() => {setModal({ ads: true }); setClickedProduct(product)}}>Adversite</Button> : <Button color="green" className="!text-gray-400" compact disabled>Ads published</Button>}
+            {!product?.isAds && product?.status !== 'Sold Out' ? <Button color="green" compact onClick={() => {setModal({ ads: true }); setClickedProduct(product)}}>Adversite</Button> : <Button color="green" className="!text-gray-400" compact disabled>Ads published</Button>}
             {product?.status === 'In Stock' ? <Button color="yellow" compact onClick={() => {setModal({ edit: true }); setClickedProduct(product); form.setValues((prev) => ({ ...prev, ...product }))}}>Edit</Button> : <Button color="yellow" className="!text-gray-400" compact disabled>Edit</Button>}
           </>}
           {storedUser?.role === 'admin' &&
@@ -427,14 +429,24 @@ const DashProducts = () => {
               onChange={(event) => form.setFieldValue('sellerNumber', event)}
             />
 
-            <Select
-              data={['Barishal', 'Chittagong', 'Dhaka', 'Khulna', 'Mymensingh', 'Rajshahi', 'Rangpur', 'Sylhet']}
+            <TextInput
+              required
+              placeholder="e.g: Dhaka"
               label="Location"
-              placeholder="Select location"
               withAsterisk
               value={form.values.sellerLocation}
-              onChange={(event) => form.setFieldValue('sellerLocation', event)}
+              onChange={(event) => form.setFieldValue('sellerLocation', event.currentTarget.value)}
               error={form.errors.sellerLocation && 'Select your location'}
+            />
+
+            <Select
+              data={['In Stock', 'Sold Out']}
+              label="Status"
+              placeholder="Change status"
+              withAsterisk
+              value={form.values.status}
+              onChange={(event) => form.setFieldValue('status', event)}
+              error={form.errors.status && 'Select product status'}
             />
 
             <Group position="right" mt="md">

@@ -48,19 +48,9 @@ const Reports = () => {
     })
   });
 
-// {
-//   "photoURL" : "https://i.ibb.co/7NNM1c5/1585765580-5028412.jpg",
-//   "title" : "Apple Watch 5",
-//   "productId": "6386b282c079ab7f5c1a3976",
-//   "sellerName" : "Justin Mullins",
-//   "sellerId": "WhnFwEmavQSFcn4b6fPnF8Mxb713",
-//   "reporterName": "Md Rasel",
-//   "comment": "Seller er price onek beshi diche new product er chaite o. Tai delete kore din"
-// }
-
   // Handle delete
   const handleDelete = () => {
-    fetch(`${import.meta.env.VITE_API_Server}/delete-product/${clickedReport?.productId}`, {
+    fetch(`${import.meta.env.VITE_API_Server}/delete-report/${clickedReport?.productId}`, {
       method: 'DELETE',
       headers: {authorization: `Bearer ${localStorage.getItem('token')}`}
     })
@@ -100,6 +90,8 @@ const Reports = () => {
       <td>{report?.sellerName}</td>
       <td>{report?.sellerEmail || report?.sellerId}</td>
       <td>{report?.reporterName}</td>
+      <td>{report?.uid}</td>
+      <td>{report?.date}</td>
       <td>
         <Button.Group>
           <Button onClick={() => { setClickedReport(report); setModal({ comment: true }) }} compact>View comment</Button>
@@ -129,6 +121,8 @@ const Reports = () => {
             <th>Seller</th>
             <th>Seller ID</th>
             <th>Reporter</th>
+            <th>Reporter ID</th>
+            <th>Date</th>
             <th>Action</th>
           </tr>
         </thead>

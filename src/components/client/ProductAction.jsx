@@ -19,19 +19,25 @@ const ProductAction = ({ user, modal, setModal, clickedProduct, setClickedProduc
     number: '',
     location: '',
     status: 'Booked',
+    sellerId: clickedProduct?.sellerId,
     productId: clickedProduct?._id,
+    orderNumber: 'BW-O-#' + Math.floor(Math.random() * 1000000000),
+    date: new Date().toLocaleString(),
   };
 
   // Report info object
   let reportInfo = {
     uid: user?.uid,
-    name: user?.displayName,
+    reporterName: user?.displayName,
     email: user?.email,
     title: clickedProduct?.title,
     photoURL: clickedProduct.imageURL,
     productId: clickedProduct?._id,
     sellerId: clickedProduct?.sellerId,
+    sellerName: clickedProduct?.sellerName,
     comment: '',
+    reportNumber: 'BW-R-#' + Math.floor(Math.random() * 1000000000),
+    date: new Date().toLocaleString(),
   };
 
   // Handle submit
@@ -64,10 +70,11 @@ const ProductAction = ({ user, modal, setModal, clickedProduct, setClickedProduc
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
         // Form reset
-        // Form reset
         e.target.reset();
         // Disable the overlay loader
         setOverlayLoading(false);
+        // Close the modal
+        setModal({booking: false, report: false});
         // Redirect to products route
         modal.booking && navigate('/dashboard/orders');
       } else {

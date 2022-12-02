@@ -32,7 +32,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const ProductCard = ({ user, storedUser, product, setClickedProduct, setModal, handleError }) => {
+const ProductCard = ({ user, storedUser, product, setClickedProduct, setModal, handleBookingError, handleReportError }) => {
   const { classes } = useStyles();
   return (
     <Grid.Col md={6} lg={3} mt={50}>
@@ -77,8 +77,8 @@ const ProductCard = ({ user, storedUser, product, setClickedProduct, setModal, h
         <Group mt={15} position="apart">
           <Text size="xl" weight={700}>${product?.resalePrice}</Text>
           <Group>
-            <Button onClick={() => { product?.status === 'Booked' || storedUser?.role === 'admin' || storedUser?.role === 'seller' ? handleError(product) : (user?.uid ? (setClickedProduct(product), setModal({booking: true})) : false) }} color={product?.status === 'Booked' ? 'gray' : ''} component={!user?.uid && product?.status !== 'Booked' ? Link : ''} to={!user?.uid && product?.status !== 'Booked' ? '/login' : ''} radius="md" style={{ flex: 1 }}>{product?.status !== 'Booked' ? (user?.uid ? 'Book Now' : 'Login to book') : 'Booked'}</Button>
-            <ActionIcon onClick={() => { setClickedProduct(product); setModal({report: true}) }} variant="default" radius="md" size={36}>
+            <Button onClick={() => { product?.status === 'Booked' || storedUser?.role === 'admin' || product?.sellerId === user?.uid ? handleBookingError(product) : (user?.uid ? (setClickedProduct(product), setModal({booking: true})) : false) }} color={product?.status === 'Booked' ? 'gray' : ''} component={!user?.uid && product?.status !== 'Booked' ? Link : ''} to={!user?.uid && product?.status !== 'Booked' ? '/login' : ''} radius="md" style={{ flex: 1 }}>{product?.status !== 'Booked' ? (user?.uid ? 'Book Now' : 'Login to book') : 'Booked'}</Button>
+            <ActionIcon onClick={() => { user?.uid && storedUser?.role !== 'admin' && user?.uid !== product?.sellerId ? (setClickedProduct(product), setModal({ report: true })) : (user?.uid ? handleReportError() : false) }} component={!user?.uid ? Link : ''} to={!user?.uid ? '/login' : ''} variant="default" radius="md" size={36}>
               <IconFlag size={18} className={classes.like} stroke={1.5} />
             </ActionIcon>
           </Group>
