@@ -5,10 +5,10 @@ import Login from '../pages/client/Login'
 import Main from '../layouts/Main'
 import Dashboard from '../layouts/Dashboard'
 import Home from '../pages/client/Home'
-import CategoryProducts from '../pages/client/CategoryProducts'
+import Products from '../pages/client/Products'
 import DashHome from '../pages/dashboard/DashHome'
-import AddProducts from '../pages/dashboard/AddProducts'
-import Products from '../pages/dashboard/Products'
+import AddProduct from '../pages/dashboard/AddProduct'
+import DashProducts from '../pages/dashboard/DashProducts'
 import Blog from '../pages/client/Blog'
 import PrivateRoute from './PrivateRoute'
 import AdminRoute from './AdminRoutes'
@@ -31,7 +31,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/category/:slug',
-        element: <PrivateRoute><CategoryProducts /></PrivateRoute>
+        element: <PrivateRoute><Products /></PrivateRoute>
       },
       {
         path: '/login',
@@ -58,11 +58,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/dashboard/product/add',
-        element: <SellerRoute><AddProducts /></SellerRoute>
+        element: <SellerRoute><AddProduct /></SellerRoute>
       },
       {
         path: '/dashboard/products',
-        element: <AdminSellerRoute><Products /></AdminSellerRoute>
+        element: <AdminSellerRoute><DashProducts /></AdminSellerRoute>
       },
       {
         path: '/dashboard/sellers',

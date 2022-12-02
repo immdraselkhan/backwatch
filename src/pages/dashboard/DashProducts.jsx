@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import useParamsAPI from '../../hooks/useParamsAPI'
 import DataLoader from '../../components/common/DataLoader'
 import { AuthContext } from '../../contexts/AuthProvider'
-import { Box, Button, Center, FileInput, Group, LoadingOverlay, Modal, NumberInput, Select, Table, Textarea, TextInput } from '@mantine/core'
+import { Avatar, Box, Button, Center, FileInput, Group, LoadingOverlay, Modal, NumberInput, Select, Table, Textarea, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconUpload } from '@tabler/icons'
 import { YearPickerInput } from 'mantine-dates-6'
@@ -15,7 +15,7 @@ import NoResultImage from '../../assets/no-result.png'
 import AdsImage from '../../assets/ads.png'
 import DeleteImage from '../../assets/delete.png'
 
-const Products = () => {
+const DashProducts = () => {
 
   // Set page title
   useDocumentTitle('Products - BackWatch');
@@ -268,6 +268,9 @@ const Products = () => {
   // Map the products
   const rows = products?.map((product) => (
     <tr key={product._id}>
+      <td>
+        <Avatar src={product?.imageURL} />
+      </td>
       <td>{product.title}</td>
       <td>{product.category}</td>
       <td>{product.condition}</td>
@@ -306,6 +309,7 @@ const Products = () => {
       <Table>
         <thead>
           <tr>
+            <th>Photo</th>
             <th>Title</th>
             <th>Category</th>
             <th>Condition</th>
@@ -327,7 +331,7 @@ const Products = () => {
         centered
       >
         <Box style={{ maxWidth: 600, position: 'relative' }} mx="auto">
-          <form onSubmit={form.onSubmit((values) => {handleSubmit(values); setOverlayLoading(form.isTouched())})} className="space-y-5">
+          <form onSubmit={form.onSubmit(values => {handleSubmit(values); setOverlayLoading(form.isTouched())})} className="space-y-5">
             <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
             <TextInput
               required
@@ -469,4 +473,4 @@ const Products = () => {
   )
 };
 
-export default Products;
+export default DashProducts;

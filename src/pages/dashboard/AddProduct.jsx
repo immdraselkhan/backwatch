@@ -12,7 +12,7 @@ import useAPI from '../../hooks/useAPI'
 import DataLoader from '../../components/common/DataLoader'
 import { toast } from 'react-toastify'
 
-const AddProducts = () => {
+const AddProduct = () => {
 
   // Set page title
   useDocumentTitle('Add Product - BackWatch');
@@ -244,13 +244,13 @@ const AddProducts = () => {
           onChange={(event) => form.setFieldValue('sellerNumber', event)}
         />
 
-        <Select
-          data={['Barishal', 'Chittagong', 'Dhaka', 'Khulna', 'Mymensingh', 'Rajshahi', 'Rangpur', 'Sylhet']}
+        <TextInput
+          required
+          placeholder="e.g: Dhaka"
           label="Location"
-          placeholder="Select location"
           withAsterisk
           value={form.values.sellerLocation}
-          onChange={(event) => form.setFieldValue('sellerLocation', event)}
+          onChange={(event) => form.setFieldValue('sellerLocation', event.currentTarget.value)}
           error={form.errors.sellerLocation && 'Select your location'}
         />
         
@@ -262,4 +262,4 @@ const AddProducts = () => {
   )
 };
 
-export default AddProducts;
+export default AddProduct;

@@ -94,8 +94,6 @@ const ClientHeader = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
 
-  console.log(colorScheme);
-
   // Menu state
   const [opened, { toggle, close }] = useDisclosure(false);
   const { classes, cx } = useStyles();
@@ -141,7 +139,7 @@ const ClientHeader = () => {
   return (
     <Header height={HEADER_HEIGHT} mb={120} className={`${classes.root} sticky z-[999]`}>
       <Container size="xl" className={classes.header}>
-        <img component={Link} to="/" src={colorScheme === 'dark' ? LogoLight : LogoDark} alt="Logo" width={100} />
+        <Link to='/'><img src={colorScheme === 'dark' ? LogoLight : LogoDark} alt="Logo" width={100} /></Link>
         <Group spacing={5} className={classes.links}>
           {menuItems}
         </Group>

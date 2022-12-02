@@ -3,6 +3,7 @@ import { createStyles, Image, Accordion, Grid, Col, Container, Title } from '@ma
 import { useDocumentTitle } from '@mantine/hooks'
 import FaqImage from '../../assets/faq.svg'
 
+// Styles
 const useStyles = createStyles((theme) => ({
   wrapper: {
     paddingTop: theme.spacing.xl,
