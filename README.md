@@ -7,7 +7,7 @@ Here someone can register as sell and sell used watches free of cost and buyer c
 
 #### adminURL
 ```
-https://backwatchshop.web.app/dashbaord
+https://backwatchshop.web.app/dashboard
 ```
 #### adminEmail
 ```

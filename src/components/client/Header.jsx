@@ -4,6 +4,8 @@ import { AuthContext } from '../../contexts/AuthProvider'
 import { createStyles, Header, Container, Group, Burger, Paper, Transition, Button, ActionIcon, Menu, useMantineColorScheme, Avatar, Box, Text, Loader, Indicator, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconSun, IconMoonStars, IconLogout } from '@tabler/icons'
+import useParamsAPI from '../../hooks/useParamsAPI'
+import DataLoader from '../common/DataLoader'
 import { toast } from 'react-toastify'
 import LogoDark from '../../assets/logo.svg'
 import LogoLight from '../../assets/logo-light.svg'
@@ -84,6 +86,9 @@ const ClientHeader = () => {
   // Get data from AuthContext
   const { user, loading, userLogOut } = useContext(AuthContext);
 
+  // Get user from the database
+  const { data: storedUser, dataLoading: roleLoading } = useParamsAPI('user', user?.uid);
+
   // useNavigate hook
   const navigate = useNavigate();
 
@@ -136,6 +141,11 @@ const ClientHeader = () => {
     });
   };
 
+  // Loader until we got the data
+  if (loading || roleLoading) {
+    return <DataLoader />;
+  };
+
   return (
     <Header height={HEADER_HEIGHT} mb={120} className={`${classes.root} sticky z-[999]`}>
       <Container size="xl" className={classes.header}>
@@ -156,7 +166,7 @@ const ClientHeader = () => {
             {dark ? <IconSun size={18} /> : <IconMoonStars size={18} />}
           </ActionIcon>
           {
-            loading ? <Loader size="xs" variant="dots" /> : <Button component={Link} to={user?.uid ? '/dashboard' : '/login'} variant="default">{user?.uid ? 'Dashboard' : 'Log in'}</Button>
+            loading ? <Loader size="xs" variant="dots" /> : <Button component={Link} to={user?.uid && storedUser?.role !== 'buyer' ? '/dashboard' : (user?.uid ? '/dashboard/orders' : '/login')} variant="default">{user?.uid && storedUser?.role === 'buyer' ? 'My Orders' : (user?.uid ? 'Dashboard' : 'Login')}</Button>
           }
           {user?.uid &&
             <Menu trigger="hover" withArrow>

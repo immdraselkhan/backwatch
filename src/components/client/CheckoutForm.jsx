@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { Button } from '@mantine/core'
+import { Button, LoadingOverlay } from '@mantine/core'
 import { toast } from 'react-toastify'
 
 const CheckoutForm = ({order, setModal}) => {
@@ -10,6 +10,9 @@ const CheckoutForm = ({order, setModal}) => {
 
   // useElement hook
   const elements = useElements();
+
+  // Overlay loader state
+  const [overlayLoading, setOverlayLoading] = useState(false);
 
   // Client secret state
   const [clientSecret, setClientSecret] = useState("");
@@ -40,11 +43,13 @@ const CheckoutForm = ({order, setModal}) => {
   };
 
   // Handle submit
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (e) => {
     // Disabling form default behavior
-    event.preventDefault();
+    e.preventDefault();
 
     if (!stripe || !elements) {
+      // Disable the overlay loader
+      setOverlayLoading(false);
       // Stripe.js has not loaded yet. Make sure to disable
       // form submission until Stripe.js has loaded.
       return;
@@ -56,6 +61,8 @@ const CheckoutForm = ({order, setModal}) => {
     const card = elements.getElement(CardElement);
 
     if (card == null) {
+      // Disable the overlay loader
+      setOverlayLoading(false);
       return;
     };
 
@@ -71,6 +78,8 @@ const CheckoutForm = ({order, setModal}) => {
       toast.error(error?.message, {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
+      // Disable the overlay loader
+      setOverlayLoading(false);
     };
 
     // Confirm card payment
@@ -93,6 +102,8 @@ const CheckoutForm = ({order, setModal}) => {
       toast.error(confirmError?.message, {
         autoClose: 1500, position: toast.POSITION.TOP_CENTER
       });
+      // Disable the overlay loader
+      setOverlayLoading(false);
       return;
     };
 
@@ -102,8 +113,8 @@ const CheckoutForm = ({order, setModal}) => {
       method: 'PATCH',
       headers: {
         'content-type': 'application/json',
-        authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+          authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
         body: JSON.stringify({ trxId: paymentIntent?.id, status: 'Paid' })
       })
       .then(res => res.json())
@@ -114,14 +125,18 @@ const CheckoutForm = ({order, setModal}) => {
             autoClose: 1500, position: toast.POSITION.TOP_CENTER
           });
           // Form reset
-          event.target.reset();
+          e.target.reset();
           // Close the modal
-          setModal({pay: false});
+          setModal({ pay: false });
+          // Disable the overlay loader
+          setOverlayLoading(false);
         } else {
           // Error toast
           toast.error(data.message, {
             autoClose: 1500, position: toast.POSITION.TOP_CENTER
           });
+          // Disable the overlay loader
+          setOverlayLoading(false);
         };
       })
       .catch(error => {
@@ -129,14 +144,15 @@ const CheckoutForm = ({order, setModal}) => {
         toast.error(error.message, {
           autoClose: 1500, position: toast.POSITION.TOP_CENTER
         });
+        // Disable the overlay loader
+        setOverlayLoading(false);
       });
     };
-
-    console.log(paymentIntent);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={e => { handleSubmit(e); setOverlayLoading(true) }} >
+      <LoadingOverlay visible={overlayLoading} overlayBlur={1} radius="sm" />
       <CardElement
         options={{
           style: {

@@ -11,6 +11,7 @@ import { toast } from 'react-toastify'
 import NoResultImage from '../../assets/no-result.png'
 import DeleteImage from '../../assets/delete.png'
 import CheckoutForm from '../../components/client/CheckoutForm'
+import { Link } from 'react-router-dom'
 
 const Orders = () => {
 
@@ -99,15 +100,14 @@ const Orders = () => {
       <td>{order?.orderNumber}</td>
       <td>{order?.title}</td>
       <td>{order?.name}</td>
-      <td>{order?.location}</td>
-      <td>{order?.number}</td>
       <td>{order?.price}</td>
       <td>{order?.trxId || 'Not paid yet!'}</td>
       <td>{order?.date}</td>
       <td>{order?.status}</td>
       <td>
         {storedUser?.role === 'admin' && <Button onClick={() => { setClickedOrder(order); setModal({ delete: true}) }} variant="gradient" gradient={{ from: 'red', to: 'orange' }} compact>Delete</Button>}
-        {storedUser?.role === 'buyer' || clickedOrder?.status !== 'Paid' && <Button onClick={() => { setClickedOrder(order); setModal({ pay: true }) }} variant="gradient" gradient={{ from: 'indigo', to: 'cyan' }} compact>Pay Now</Button>}
+        {(storedUser?.role === 'buyer' && order?.status === 'Booked') && <Button onClick={() => { setClickedOrder(order); setModal({ pay: true }) }} variant="gradient" gradient={{ from: 'indigo', to: 'cyan' }} compact>Pay Now</Button>}
+        {(storedUser?.role === 'buyer' && order?.status === 'Paid') && <Button color="gray" component={Link} to="/" compact>Buy more</Button>}
       </td>
     </tr>
   ));
@@ -131,13 +131,11 @@ const Orders = () => {
             <th>Order Number</th>
             <th>Title</th>
             <th>Name</th>
-            <th>Location</th>
-            <th>Phone Number</th>
             <th>Price</th>
             <th>Transaction ID</th>
             <th>Date</th>
             <th>Status</th>
-              {(storedUser?.role === 'admin' || (storedUser?.role === 'buyer' || clickedOrder?.status !== 'Paid')) && <th>Action</th>}
+              {(storedUser?.role === 'admin' || storedUser?.role === 'buyer') && <th>Action</th>}
           </tr>
         </thead>
         <tbody>{rows}</tbody>
