@@ -5,15 +5,21 @@ Here someone can register as sell and sell used watches free of cost and buyer c
 
 #### Live Website - [https://backwatchshop.web.app](https://backwatchshop.web.app)
 
-#### adminURL
+#### Live Site Code - [https://github.com/immdraselkhan/backwatch](https://github.com/immdraselkhan/backwatch)
+
+#### API Server - [https://backwatch-api.vercel.app](https://backwatch-api.vercel.app)
+
+#### API Server Code - [https://github.com/immdraselkhan/backwatch-api](https://github.com/immdraselkhan/backwatch-api)
+
+#### Admin URL
 ```
 https://backwatchshop.web.app/dashboard
 ```
-#### adminEmail
+#### Admin Email
 ```
 immdraselkhan@gmail.com
 ```
-#### adminPassword
+#### Admin Password
 ```
 Password12345
 ```
